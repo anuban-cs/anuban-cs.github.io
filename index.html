@@ -4,37 +4,82 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <title>ระบบห้องสมุดโรงเรียน</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
-      body { font-family: 'Sarabun', sans-serif; background-color: #f0f2f5; padding-bottom: 80px; }
-      .app-header { background: linear-gradient(135deg, #6f42c1, #5a32a3); color: white; padding: 20px 15px 30px 15px; text-align: center; border-radius: 0 0 30px 30px; box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3); }
+      body { 
+        font-family: 'Sarabun', sans-serif; 
+        background-color: #f0f2f5; 
+        padding-bottom: 80px; 
+      }
+      .app-header { 
+        background: linear-gradient(135deg, #6f42c1, #5a32a3); 
+        color: white; 
+        padding: 20px 15px 30px 15px; 
+        text-align: center; 
+        border-radius: 0 0 30px 30px; 
+        box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3); 
+      }
       .container { max-width: 600px; padding: 0 15px; margin-top: -20px;}
-      .card { border-radius: 20px; border: none; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 20px; overflow: hidden; }
+      
+      .card { 
+        border-radius: 20px; 
+        border: none; 
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05); 
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
       .card-body { padding: 25px; }
+
       .form-control, .form-select { border-radius: 12px; padding: 12px 15px; border: 1px solid #dee2e6;}
       .btn { border-radius: 12px; padding: 12px 20px; font-weight: 600; }
       .btn-primary { background-color: #6f42c1; border-color: #6f42c1;}
-      #reader-borrow, #reader-add { width: 100%; display: none; margin-bottom: 20px; border-radius: 15px; background: #000; overflow: hidden; }
-      .book-img { width: 70px; height: 100px; object-fit: cover; border-radius: 8px; background-color: #e9ecef; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-      .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; box-shadow: 0 -2px 15px rgba(0,0,0,0.08); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; border-radius: 25px 25px 0 0; }
-      .nav-item-bottom { text-align: center; color: #adb5bd; font-size: 0.8rem; flex: 1; cursor: pointer; transition: all 0.3s ease; }
+      
+      /* Camera Box */
+      #reader-borrow, #reader-add { 
+        width: 100%; display: none; margin-bottom: 20px; 
+        border-radius: 15px; background: #000; overflow: hidden;
+      }
+      
+      .book-img { 
+        width: 70px; height: 100px; object-fit: cover; 
+        border-radius: 8px; background-color: #e9ecef; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+
+      /* Bottom Nav */
+      .bottom-nav {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: white;
+        box-shadow: 0 -2px 15px rgba(0,0,0,0.08);
+        display: flex; justify-content: space-around;
+        padding: 12px 0; z-index: 1000;
+        border-radius: 25px 25px 0 0;
+      }
+      .nav-item-bottom {
+        text-align: center; color: #adb5bd; font-size: 0.8rem;
+        flex: 1; cursor: pointer; transition: all 0.3s ease;
+      }
       .nav-item-bottom i { font-size: 1.5rem; display: block; margin-bottom: 2px; }
       .nav-item-bottom.active { color: #6f42c1; font-weight: bold; transform: translateY(-3px);}
-      .nav-pills { display: none; }
+      .nav-pills { display: none; } /* Hide default tabs */
     </style>
   </head>
   <body>
+
     <div class="app-header">
       <h3 class="mb-1 fw-bold"><i class="bi bi-journal-bookmark-fill"></i> ห้องสมุดโรงเรียน</h3>
       <p class="mb-0 text-white-50 small">อนุบาลชุมแสง (วัดทับกฤชกลาง)</p>
     </div>
 
     <div class="container">
+      
       <ul class="nav nav-pills" id="pills-tab">
         <li class="nav-item"><button class="nav-link active" id="tab-search-btn" data-bs-toggle="pill" data-bs-target="#tab-search"></button></li>
         <li class="nav-item"><button class="nav-link" id="tab-borrow-btn" data-bs-toggle="pill" data-bs-target="#tab-borrow"></button></li>
@@ -42,6 +87,7 @@
       </ul>
 
       <div class="tab-content">
+        
         <div class="tab-pane fade show active" id="tab-search">
           <div class="card">
             <div class="card-body">
@@ -59,11 +105,14 @@
           <div class="card">
             <div class="card-body">
               <h5 class="fw-bold text-secondary mb-4"><i class="bi bi-arrow-left-right"></i> ยืม-คืนหนังสือ</h5>
+              
               <div id="reader-borrow"></div>
+              
               <div class="mb-3">
                 <label class="form-label text-muted small fw-bold">รหัสนักเรียน</label>
                 <input type="number" id="studentId" class="form-control" placeholder="ระบุเลขประจำตัว">
               </div>
+              
               <div class="mb-4">
                  <label class="form-label text-muted small fw-bold">ISBN หนังสือ</label>
                  <div class="input-group">
@@ -71,9 +120,14 @@
                    <button class="btn btn-primary" onclick="toggleScanner('isbnBorrow', 'reader-borrow')"><i class="bi bi-qr-code-scan"></i></button>
                  </div>
               </div>
+
               <div class="row g-2">
-                <div class="col-6"><button onclick="processTransaction('borrowBook')" class="btn btn-success w-100"><i class="bi bi-box-arrow-up-right"></i> ยืม</button></div>
-                <div class="col-6"><button onclick="processTransaction('returnBook')" class="btn btn-secondary w-100"><i class="bi bi-box-arrow-in-down-left"></i> คืน</button></div>
+                <div class="col-6">
+                  <button onclick="processTransaction('borrowBook')" class="btn btn-success w-100"><i class="bi bi-box-arrow-up-right"></i> ยืม</button>
+                </div>
+                <div class="col-6">
+                  <button onclick="processTransaction('returnBook')" class="btn btn-secondary w-100"><i class="bi bi-box-arrow-in-down-left"></i> คืน</button>
+                </div>
               </div>
             </div>
           </div>
@@ -83,48 +137,78 @@
           <div class="card">
             <div class="card-body">
               <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-plus-circle-fill"></i> เพิ่มหนังสือใหม่</h5>
+              
               <div id="reader-add"></div>
+
               <form id="addBookForm" onsubmit="submitBook(event)">
                 <div class="mb-3">
                   <label class="form-label text-muted small fw-bold">ISBN (บาร์โค้ด)</label>
                   <div class="input-group">
-                    <input type="text" id="isbnAdd" name="isbn" class="form-control" placeholder="สแกนเพื่อดึงข้อมูล" required onchange="fetchBookInfo()">
-                    <button class="btn btn-primary" type="button" onclick="toggleScanner('isbnAdd', 'reader-add')"><i class="bi bi-camera-fill"></i></button>
+                    <input type="text" id="isbnAdd" name="isbn" class="form-control" placeholder="สแกนหรือพิมพ์เลข..." required>
+                    
+                    <button class="btn btn-info text-white" type="button" onclick="fetchBookInfo()">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    
+                    <button class="btn btn-primary" type="button" onclick="toggleScanner('isbnAdd', 'reader-add')">
+                        <i class="bi bi-camera-fill"></i>
+                    </button>
                   </div>
                   <div id="loadingText" class="form-text text-primary mt-2" style="display:none;"></div>
                 </div>
-                <div class="mb-2"><input type="text" id="bookName" name="bookName" class="form-control" placeholder="ชื่อหนังสือ" required></div>
+
+                <div class="mb-2">
+                  <input type="text" id="bookName" name="bookName" class="form-control" placeholder="ชื่อหนังสือ" required>
+                </div>
                 <div class="row g-2 mb-2">
                     <div class="col-7"><input type="text" id="author" name="author" class="form-control" placeholder="ผู้แต่ง"></div>
                     <div class="col-5"><input type="text" name="category" class="form-control" placeholder="หมวดหมู่"></div>
                 </div>
+
                 <div class="row g-2 mb-3">
-                   <div class="col-4"><input type="number" name="qty" class="form-control text-center" placeholder="จำนวน" required value="1"></div>
-                   <div class="col-8"><input type="text" id="imgUrl" name="imgUrl" class="form-control" placeholder="URL รูปปก (ถ้ามี)"></div>
+                   <div class="col-4">
+                      <input type="number" name="qty" class="form-control text-center" placeholder="จำนวน" required value="1">
+                   </div>
+                   <div class="col-8">
+                      <input type="text" id="imgUrl" name="imgUrl" class="form-control" placeholder="URL รูปปก (ถ้ามี)">
+                   </div>
                 </div>
+                
                 <div class="text-center mb-3">
                     <img id="previewCover" src="" class="book-img shadow-sm" style="display:none; width: 100px; height: auto; margin: 0 auto;">
                 </div>
+
                 <button type="submit" class="btn btn-warning w-100 text-dark fw-bold"><i class="bi bi-save"></i> บันทึกเข้าคลัง</button>
               </form>
             </div>
           </div>
         </div>
+
       </div>
     </div>
 
     <div class="bottom-nav">
-      <div class="nav-item-bottom active" onclick="switchTab('tab-search-btn', this)"><i class="bi bi-search"></i> ค้นหา</div>
-      <div class="nav-item-bottom" onclick="switchTab('tab-borrow-btn', this)"><i class="bi bi-arrow-left-right"></i> ยืม-คืน</div>
-      <div class="nav-item-bottom" onclick="switchTab('tab-add-btn', this)"><i class="bi bi-plus-square"></i> ลงทะเบียน</div>
+      <div class="nav-item-bottom active" onclick="switchTab('tab-search-btn', this)">
+        <i class="bi bi-search"></i> ค้นหา
+      </div>
+      <div class="nav-item-bottom" onclick="switchTab('tab-borrow-btn', this)">
+        <i class="bi bi-arrow-left-right"></i> ยืม-คืน
+      </div>
+      <div class="nav-item-bottom" onclick="switchTab('tab-add-btn', this)">
+        <i class="bi bi-plus-square"></i> ลงทะเบียน
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       // ==========================================
-      // ⚠️ ใส่ URL API ของคุณครูตรงนี้ ⚠️
+      // ⚠️ ใส่ URL API ที่คุณครูให้มาแล้วครับ
       // ==========================================
-      const API_URL = "https://script.google.com/macros/s/AKfycby0N5cxNPb-6dHo39iDhbQYPD3Nh0v8I17qhe6FVP3dUKFgx5mO5tOgAKjM_8I-1-UymQ/exec"; 
+      const API_URL = "https://script.google.com/macros/s/AKfycby0N5cxNPb-6dHo39iDhbQYPD3Nh0v8I17qhe6FVP3dUKFgx5mO5tOgAKjM_8I-1-UymQ/exec";
+
+      // ------------------------------------------
+      // System Functions
+      // ------------------------------------------
 
       function switchTab(tabId, element) {
         document.getElementById(tabId).click(); 
@@ -135,6 +219,7 @@
 
       async function callAPI(action, data) {
         try {
+          // ใช้ no-cors ไม่ได้เพราะเราต้องการอ่าน responseJSON
           const response = await fetch(API_URL, {
             method: 'POST',
             body: JSON.stringify({ action: action, ...data })
@@ -142,6 +227,7 @@
           return await response.json();
         } catch (error) {
           console.error("API Error:", error);
+          // Fallback สำหรับบางกรณี
           try {
              const res2 = await fetch(API_URL, {
                 method: 'POST',
@@ -149,50 +235,77 @@
                 body: JSON.stringify({ action: action, ...data })
              });
              return await res2.json();
-          } catch(err2) { return null; }
+          } catch(err2) {
+             return null;
+          }
         }
       }
 
+      // 1. Search Logic
       window.onload = () => searchBooks();
 
       async function searchBooks() {
         let keyword = document.getElementById('searchInput').value;
         document.getElementById('searchResult').innerHTML = '<div class="text-center mt-4 text-muted"><span class="spinner-border spinner-border-sm"></span> กำลังโหลด...</div>';
+        
         const res = await callAPI('searchBooks', { keyword: keyword });
         if(res && res.status) {
             let html = "";
             if(res.data.length === 0) html = `<div class="text-center mt-5 text-muted"><i class="bi bi-inbox fs-1"></i><p>ไม่พบข้อมูล</p></div>`;
+            
             res.data.forEach(row => {
               let isAvail = row[5] > 0;
               let badge = isAvail ? `<span class="badge bg-success bg-opacity-10 text-success rounded-pill">ว่าง ${row[5]}</span>` : `<span class="badge bg-danger bg-opacity-10 text-danger rounded-pill">หมด</span>`;
               let img = row[6] ? `<img src="${row[6]}" class="book-img">` : `<div class="book-img d-flex align-items-center justify-content-center bg-light text-muted"><i class="bi bi-image"></i></div>`;
-              html += `<div class="list-group-item d-flex align-items-center px-0 py-3 border-bottom bg-transparent"><div class="me-3">${img}</div><div class="flex-grow-1"><h6 class="fw-bold mb-1 text-dark">${row[1]}</h6><div class="text-muted small"><i class="bi bi-person"></i> ${row[2]} <br><span class="text-secondary" style="font-size:0.75rem">ISBN: ${row[0]}</span></div></div><div class="ms-2">${badge}</div></div>`;
+              
+              html += `
+              <div class="list-group-item d-flex align-items-center px-0 py-3 border-bottom bg-transparent">
+                <div class="me-3">${img}</div>
+                <div class="flex-grow-1">
+                    <h6 class="fw-bold mb-1 text-dark">${row[1]}</h6>
+                    <div class="text-muted small">
+                        <i class="bi bi-person"></i> ${row[2]} <br>
+                        <span class="text-secondary" style="font-size:0.75rem">ISBN: ${row[0]}</span>
+                    </div>
+                </div>
+                <div class="ms-2">${badge}</div>
+              </div>`;
             });
             document.getElementById('searchResult').innerHTML = html;
         }
       }
 
+      // 2. Transaction Logic
       async function processTransaction(actionStr) {
         let sid = document.getElementById('studentId').value;
         let isbn = document.getElementById('isbnBorrow').value;
         if(!sid || !isbn) return Swal.fire('แจ้งเตือน', 'กรุณาระบุรหัสนักเรียนและ ISBN', 'warning');
+        
         Swal.fire({title: 'ประมวลผล...', didOpen: () => Swal.showLoading()});
         const res = await callAPI(actionStr, { studentId: sid, isbn: isbn });
+        
         if(res && res.status) { 
             Swal.fire('สำเร็จ', res.msg, 'success'); 
             document.getElementById('isbnBorrow').value = ''; 
             searchBooks(); 
-        } else { Swal.fire('ผิดพลาด', res ? res.msg : 'เชื่อมต่อไม่ได้', 'error'); }
+        } else { 
+            Swal.fire('ผิดพลาด', res ? res.msg : 'เชื่อมต่อไม่ได้', 'error'); 
+        }
       }
 
+      // 3. Add Book Logic (Smart Fetch)
       async function fetchBookInfo() {
         const isbn = document.getElementById('isbnAdd').value.trim();
-        if(isbn.length < 10) return;
+        if(isbn.length < 5) {
+            Swal.fire('แจ้งเตือน', 'กรุณากรอกเลข ISBN ให้ครบถ้วน', 'warning');
+            return;
+        }
+
         const loader = document.getElementById('loadingText');
         loader.style.display = 'block';
         loader.innerHTML = '<span class="spinner-border spinner-border-sm"></span> กำลังค้นหาข้อมูล...';
 
-        // 1. Check Local
+        // 3.1 เช็คในชีตเราเองก่อน
         const localCheck = await callAPI('checkBookInfo', { isbn: isbn });
         if (localCheck && localCheck.found) {
             fillForm(localCheck.title, localCheck.author, localCheck.category, localCheck.imgUrl);
@@ -200,37 +313,44 @@
             return;
         }
 
-        // 2. Check NLT (Improved)
+        // 3.2 เช็ค หอสมุดแห่งชาติ (NLT)
         const nltCheck = await callAPI('fetchNLT', { isbn: isbn });
         let nltData = null;
         if (nltCheck && nltCheck.found) nltData = nltCheck;
 
-        // 3. Check Google
+        // 3.3 เช็ค Google Books (เพื่อหารูป)
         let googleData = null;
         try {
             const gRes = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
             const gJson = await gRes.json();
             if(gJson.totalItems > 0) googleData = gJson.items[0].volumeInfo;
-        } catch(e) { console.log("Google error"); }
+        } catch(e) { console.log("Google fetch error"); }
 
+        // 3.4 ผสานข้อมูล (Merge)
         loader.style.display = 'none';
         
         let finalTitle = "", finalAuthor = "", finalCat = "", finalImg = "";
+
         if (nltData) {
+            // เจอ NLT: ใช้ชื่อไทยจาก NLT
             finalTitle = nltData.title;
             finalAuthor = nltData.author;
             finalCat = nltData.category;
+            // แต่เอารูปจาก Google ถ้ามี
             if(googleData && googleData.imageLinks) finalImg = googleData.imageLinks.thumbnail.replace("http://", "https://");
             notify('พบข้อมูลจากหอสมุดแห่งชาติ');
         } else if (googleData) {
+            // ไม่เจอ NLT แต่เจอ Google
             finalTitle = googleData.title;
             finalAuthor = googleData.authors ? googleData.authors.join(", ") : "";
             if(googleData.imageLinks) finalImg = googleData.imageLinks.thumbnail.replace("http://", "https://");
             notify('พบข้อมูลจาก Google Books');
         } else {
+            // ไม่เจอเลย
             Swal.fire({icon: 'info', title: 'หนังสือใหม่', text: 'ไม่พบข้อมูลออนไลน์ กรุณากรอกเอง', timer: 2000, showConfirmButton: false});
             return;
         }
+
         fillForm(finalTitle, finalAuthor, finalCat, finalImg);
       }
 
@@ -246,13 +366,17 @@
           }
       }
 
-      function notify(msg) { Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000}).fire({icon: 'success', title: msg}); }
+      function notify(msg) {
+          Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000}).fire({icon: 'success', title: msg});
+      }
 
       async function submitBook(e) {
         e.preventDefault();
         Swal.fire({title: 'บันทึก...', didOpen: () => Swal.showLoading()});
+        
         const formData = new FormData(document.getElementById("addBookForm"));
         const res = await callAPI('addNewBook', { formObject: Object.fromEntries(formData.entries()) });
+        
         if(res && res.status) {
            Swal.fire('เรียบร้อย', res.msg, 'success');
            document.getElementById("addBookForm").reset();
@@ -261,28 +385,51 @@
         }
       }
 
-      let html5QrCode = null; let currentReaderId = null;
+      // 4. Camera Scanner Logic
+      let html5QrCode = null; 
+      let currentReaderId = null;
+
       function toggleScanner(inputId, readerId) {
-        if (html5QrCode && html5QrCode.isScanning && currentReaderId === readerId) { stopScan(); } else { startScan(inputId, readerId); }
+        if (html5QrCode && html5QrCode.isScanning && currentReaderId === readerId) { 
+            stopScan(); 
+        } else { 
+            startScan(inputId, readerId); 
+        }
       }
+
       function startScan(inputId, readerId) {
         if (html5QrCode && html5QrCode.isScanning) stopScan();
+        
         const readerElement = document.getElementById(readerId);
         readerElement.style.display = 'block';
+        
         html5QrCode = new Html5Qrcode(readerId);
         currentReaderId = readerId;
+        
         const onScanSuccess = (decodedText) => {
             document.getElementById(inputId).value = decodedText;
             if (window.navigator.vibrate) window.navigator.vibrate(200);
             stopScan();
-            if(inputId === 'isbnAdd') fetchBookInfo(); 
+            
+            // ✅ ถ้าเป็นการสแกนเพื่อเพิ่มหนังสือ ให้ดึงข้อมูลทันที (Auto Fetch for Camera only)
+            if(inputId === 'isbnAdd') {
+                setTimeout(() => fetchBookInfo(), 500); 
+            }
         };
+
         html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 150 } }, onScanSuccess)
-        .catch(() => { html5QrCode.start({ facingMode: "user" }, { fps: 10, qrbox: { width: 250, height: 150 } }, onScanSuccess).catch(() => Swal.fire('กล้องไม่พร้อม', 'กรุณาอนุญาตการใช้กล้อง', 'error')); });
+        .catch(() => {
+            html5QrCode.start({ facingMode: "user" }, { fps: 10, qrbox: { width: 250, height: 150 } }, onScanSuccess)
+            .catch(() => Swal.fire('กล้องไม่พร้อม', 'กรุณาอนุญาตการใช้กล้อง', 'error'));
+        });
       }
+
       function stopScan() {
         if (html5QrCode && html5QrCode.isScanning) {
-            html5QrCode.stop().then(() => { html5QrCode.clear(); if(currentReaderId) document.getElementById(currentReaderId).style.display = 'none'; });
+            html5QrCode.stop().then(() => { 
+                html5QrCode.clear(); 
+                if(currentReaderId) document.getElementById(currentReaderId).style.display = 'none'; 
+            });
         }
       }
     </script>
