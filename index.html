@@ -378,8 +378,9 @@
                     title: 'อ่านข้อมูลสำเร็จ!',
                     html: `<b>ชื่อเรื่อง:</b> ${res.title}<br><b>ผู้แต่ง:</b> ${res.author}<br><small class="text-muted">ตรวจสอบความถูกต้องอีกครั้งนะครับ</small>`
                 });
-            } else {
-                Swal.fire('ขออภัย', 'อ่านตัวหนังสือไม่ออก หรือภาพไม่ชัด', 'error');
+           } else {
+                // ให้มันแสดง Error จริงๆ ที่ส่งมาจาก Server
+                Swal.fire('เกิดข้อผิดพลาด', res ? res.msg : 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้', 'error');
             }
             input.value = ''; 
         }
