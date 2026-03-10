@@ -1,462 +1,584 @@
 <!DOCTYPE html>
 <html lang="th">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <title>ระบบห้องสมุดโรงเรียน</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระบบสารบรรณอิเล็กทรอนิกส์ — รร.อนุบาลชุมแสง</title>
 
-    <style>
-      body { 
-        font-family: 'Sarabun', sans-serif; 
-        background-color: #f0f2f5; 
-        padding-bottom: 90px; /* เผื่อพื้นที่ให้เมนูด้านล่าง */
-      }
-      .app-header { 
-        background: linear-gradient(135deg, #6f42c1, #5a32a3); 
-        color: white; 
-        padding: 20px 15px 30px 15px; 
-        text-align: center; 
-        border-radius: 0 0 30px 30px; 
-        box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3); 
-      }
-      .container { max-width: 600px; padding: 0 15px; margin-top: -20px;}
-      
-      .card { 
-        border-radius: 20px; 
-        border: none; 
-        box-shadow: 0 8px 20px rgba(0,0,0,0.05); 
-        margin-bottom: 20px;
-        overflow: hidden;
-      }
-      .card-body { padding: 25px; }
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
-      .form-control, .form-select { border-radius: 12px; padding: 12px 15px; border: 1px solid #dee2e6;}
-      .btn { border-radius: 12px; padding: 12px 20px; font-weight: 600; }
-      .btn-primary { background-color: #6f42c1; border-color: #6f42c1;}
-      
-      /* Camera Box */
-      #reader-borrow, #reader-add { 
-        width: 100%; display: none; margin-bottom: 20px; 
-        border-radius: 15px; background: #000; overflow: hidden;
-      }
-      
-      .book-img { 
-        width: 70px; height: 100px; object-fit: cover; 
-        border-radius: 8px; background-color: #e9ecef; 
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-
-      /* Bottom Nav */
-      .bottom-nav {
-        position: fixed; bottom: 0; left: 0; right: 0;
-        background: white;
-        box-shadow: 0 -2px 15px rgba(0,0,0,0.08);
-        display: flex; justify-content: space-around;
-        padding: 12px 0; z-index: 1000;
-        border-radius: 25px 25px 0 0;
-      }
-      .nav-item-bottom {
-        text-align: center; color: #adb5bd; font-size: 0.8rem;
-        flex: 1; cursor: pointer; transition: all 0.3s ease;
-      }
-      .nav-item-bottom i { font-size: 1.5rem; display: block; margin-bottom: 2px; }
-      .nav-item-bottom.active { color: #6f42c1; font-weight: bold; transform: translateY(-3px);}
-      .nav-pills { display: none; } /* Hide default tabs */
-    </style>
-  </head>
-  <body>
-
-    <div class="app-header">
-      <h3 class="mb-1 fw-bold"><i class="bi bi-journal-bookmark-fill"></i> ห้องสมุดโรงเรียน</h3>
-      <p class="mb-0 text-white-50 small">อนุบาลชุมแสง (วัดทับกฤชกลาง)</p>
+<!-- ============================================================
+     NAVBAR (ซ่อนตอน Login)
+     ============================================================ -->
+<nav id="main-navbar" class="navbar navbar-expand-lg navbar-dark hidden">
+  <div class="container">
+    <span class="navbar-brand">
+      <i class="bi bi-building me-2"></i>E-Saraban
+    </span>
+    <div class="d-flex align-items-center gap-3 text-white">
+      <small id="nav-user-info" class="d-none d-md-inline"></small>
+      <button id="btn-logout" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-box-arrow-right me-1"></i>ออกจากระบบ
+      </button>
     </div>
+  </div>
+</nav>
 
-    <div class="container">
-      
-      <ul class="nav nav-pills" id="pills-tab">
-        <li class="nav-item"><button class="nav-link active" id="tab-search-btn" data-bs-toggle="pill" data-bs-target="#tab-search"></button></li>
-        <li class="nav-item"><button class="nav-link" id="tab-borrow-btn" data-bs-toggle="pill" data-bs-target="#tab-borrow"></button></li>
-        <li class="nav-item"><button class="nav-link" id="tab-add-btn" data-bs-toggle="pill" data-bs-target="#tab-add"></button></li>
-      </ul>
+<!-- ============================================================
+     LOGIN SECTION
+     ============================================================ -->
+<div id="login-section" class="login-wrapper">
+  <div class="login-card">
+    <div class="login-logo">
+      <i class="bi bi-building-fill-gear"></i>
+    </div>
+    <h5 class="fw-bold text-center text-primary mb-1">ระบบสารบรรณอิเล็กทรอนิกส์</h5>
+    <p class="text-center text-muted small mb-4">โรงเรียนอนุบาลชุมแสง (วัดทับกฤชกลาง)</p>
 
-      <div class="tab-content">
-        
-        <div class="tab-pane fade show active" id="tab-search">
-          <div class="card">
-            <div class="card-body">
-               <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-search"></i> ค้นหาหนังสือ</h5>
-               <div class="input-group mb-3">
-                 <input type="text" id="searchInput" class="form-control" placeholder="พิมพ์ชื่อหนังสือ...">
-                 <button onclick="searchBooks()" class="btn btn-warning"><i class="bi bi-search"></i></button>
-               </div>
-               <div id="searchResult" class="list-group list-group-flush mt-3"></div>
+    <form id="loginForm">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">ชื่อผู้ใช้งาน</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+          <input type="text" class="form-control" id="username" autocomplete="username" required placeholder="กรอก username">
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-semibold">รหัสผ่าน</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+          <input type="password" class="form-control" id="password" autocomplete="current-password" required placeholder="กรอก password">
+        </div>
+      </div>
+      <button type="submit" id="btn-login" class="btn btn-primary w-100 py-2">
+        <i class="bi bi-box-arrow-in-right me-1"></i>เข้าสู่ระบบ
+      </button>
+      <div id="login-alert" class="alert alert-danger mt-3 mb-0 hidden" role="alert"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     DASHBOARD SECTION
+     ============================================================ -->
+<div id="dashboard-section" class="container py-4 hidden">
+  <!-- Welcome Card -->
+  <div class="card welcome-card shadow mb-4">
+    <div class="card-body p-4">
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <div class="rounded-circle bg-white bg-opacity-25 d-flex align-items-center justify-content-center"
+             style="width:56px;height:56px;flex-shrink:0">
+          <i class="bi bi-person-fill text-white fs-2"></i>
+        </div>
+        <div>
+          <div class="text-white-50 small">ยินดีต้อนรับ</div>
+          <h3 id="user-fullname" class="fw-bold text-white mb-1">...</h3>
+          <p id="user-position" class="text-white mb-2 opacity-75">...</p>
+          <span id="user-role"  class="role-badge me-2">...</span>
+          <span id="user-id"   class="role-badge">...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu Grid -->
+  <div id="menu-area" class="row"></div>
+</div>
+
+<!-- ============================================================
+     DEPUTY LIST SECTION
+     ============================================================ -->
+<div id="deputy-list-section" class="container py-4 hidden">
+  <div class="section-header">
+    <h4 class="text-warning"><i class="bi bi-clock-history me-2"></i>หนังสือรอพิจารณา (รอง ผอ.)</h4>
+    <button class="btn-back" data-back-dashboard><i class="bi bi-arrow-left"></i> กลับหน้าหลัก</button>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr><th>วันที่</th><th>เลขที่/เรื่อง</th><th>จาก</th><th>จัดการ</th></tr>
+          </thead>
+          <tbody id="deputy-table-body"></tbody>
+        </table>
+      </div>
+      <p id="no-doc-msg" class="text-center text-muted py-5 hidden">
+        <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>ไม่มีหนังสือรอพิจารณา
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     DIRECTOR LIST SECTION
+     ============================================================ -->
+<div id="director-list-section" class="container py-4 hidden">
+  <div class="section-header">
+    <h4 class="text-danger"><i class="bi bi-person-badge me-2"></i>หนังสือรอสั่งการ (ผู้อำนวยการ)</h4>
+    <button class="btn-back" data-back-dashboard><i class="bi bi-arrow-left"></i> กลับหน้าหลัก</button>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr><th>วันที่</th><th>เรื่อง</th><th>ความเห็น รองฯ</th><th>คำสั่ง</th></tr>
+          </thead>
+          <tbody id="director-table-body"></tbody>
+        </table>
+      </div>
+      <p id="no-dir-doc-msg" class="text-center text-muted py-5 hidden">
+        <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>ไม่มีหนังสือรอสั่งการ
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TEACHER TASK SECTION
+     ============================================================ -->
+<div id="teacher-task-section" class="container py-4 hidden">
+  <div class="section-header">
+    <h4 class="text-primary"><i class="bi bi-person-workspace me-2"></i>งานที่ได้รับมอบหมาย</h4>
+    <button class="btn-back" data-back-dashboard><i class="bi bi-arrow-left"></i> กลับหน้าหลัก</button>
+  </div>
+  <div id="task-list-container" class="row"></div>
+</div>
+
+<!-- ============================================================
+     TRACKING SECTION
+     ============================================================ -->
+<div id="tracking-section" class="container py-4 hidden">
+  <div class="section-header">
+    <h4 class="text-secondary"><i class="bi bi-search me-2"></i>ติดตามสถานะหนังสือราชการ</h4>
+    <button class="btn-back" data-back-dashboard><i class="bi bi-arrow-left"></i> กลับหน้าหลัก</button>
+  </div>
+  <div class="input-group mb-3">
+    <input type="text" id="search-input" class="form-control" placeholder="ค้นหาเรื่อง / เลขที่หนังสือ... (กด Enter)">
+    <button class="btn btn-outline-primary" onclick="docs.filterTracking()">
+      <i class="bi bi-search"></i> ค้นหา
+    </button>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered mb-0">
+          <thead>
+            <tr>
+              <th style="width:12%">วันที่</th>
+              <th style="width:30%">เรื่อง / เลขที่</th>
+              <th style="width:10%" class="text-center">ไฟล์แนบ</th>
+              <th style="width:15%">สถานะ</th>
+              <th style="width:20%">ความคืบหน้า</th>
+              <th style="width:8%">รายละเอียด</th>
+            </tr>
+          </thead>
+          <tbody id="tracking-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     LEAVE SECTION
+     ============================================================ -->
+<div id="leave-section" class="container py-4 hidden">
+  <div class="section-header">
+    <h4 class="text-success"><i class="bi bi-calendar2-check me-2"></i>ระบบการลาออนไลน์</h4>
+    <div class="d-flex gap-2">
+      <button class="btn-back" data-back-dashboard><i class="bi bi-arrow-left"></i> กลับหน้าหลัก</button>
+      <button class="btn btn-success btn-sm" onclick="leaves.openLeaveModal()">
+        <i class="bi bi-plus-lg"></i> เขียนใบลา
+      </button>
+    </div>
+  </div>
+  <div class="alert alert-info shadow-sm">
+    <i class="bi bi-info-circle-fill me-1"></i>
+    การลาป่วย/ลากิจ/ลาคลอด ต้องผ่านการตรวจสอบ <strong>เจ้าหน้าที่ → รอง ผอ. → ผอ.</strong> ตามลำดับ
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-header bg-white fw-bold text-success border-bottom">
+      <i class="bi bi-clock-history me-1"></i> ประวัติการลาของฉัน
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead>
+            <tr>
+              <th width="40%">วันที่ลา / จำนวนวัน</th>
+              <th width="20%">ประเภท</th>
+              <th width="20%">สถานะ</th>
+              <th width="20%" class="text-end">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="my-leave-body"></tbody>
+        </table>
+      </div>
+      <div id="no-leave-msg" class="text-center text-muted py-5 hidden">
+        <i class="bi bi-clipboard-x fs-1 d-block mb-2 opacity-50"></i>ยังไม่มีประวัติการลา
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     APPROVE LEAVE SECTION
+     ============================================================ -->
+<div id="approve-leave-section" class="container py-4 hidden">
+  <div class="section-header">
+    <h4 id="approve-title" class="text-primary">รายการใบลาที่รออนุมัติ</h4>
+    <button class="btn-back" data-back-dashboard><i class="bi bi-arrow-left"></i> กลับหน้าหลัก</button>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr><th>ผู้ขอลา</th><th>ประเภท/วันที่</th><th>จำนวนวัน</th><th>จัดการ</th></tr>
+          </thead>
+          <tbody id="approve-leave-body"></tbody>
+        </table>
+      </div>
+      <p id="no-approve-msg" class="text-center text-muted py-5 hidden">
+        <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>ไม่มีรายการค้าง
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STATS SECTION
+     ============================================================ -->
+<div id="stats-section" class="container py-4 hidden">
+  <div class="section-header">
+    <h4 class="text-primary"><i class="bi bi-bar-chart-line me-2"></i>สถิติการลาของบุคลากร</h4>
+    <button class="btn-back" data-back-dashboard><i class="bi bi-arrow-left"></i> กลับหน้าหลัก</button>
+  </div>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <canvas id="leaveChart" style="max-height:400px"></canvas>
+    </div>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white fw-bold">ตารางสรุปรายบุคคล</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped mb-0 text-center">
+          <thead class="table-light">
+            <tr>
+              <th class="text-start">ชื่อ-สกุล</th>
+              <th class="text-danger">ป่วย (วัน)</th>
+              <th class="text-warning">กิจ (วัน)</th>
+              <th class="text-info">คลอด (วัน)</th>
+              <th class="table-dark">รวมทั้งหมด</th>
+            </tr>
+          </thead>
+          <tbody id="stats-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODALS
+     ============================================================ -->
+
+<!-- Modal: ลงทะเบียนหนังสือรับ -->
+<div class="modal fade" id="modalRegister" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title"><i class="bi bi-envelope-plus-fill me-2"></i>ลงทะเบียนหนังสือรับ</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formRegister">
+          <input type="hidden" id="reg-userId">
+          <div class="mb-2"><label class="form-label fw-semibold">เลขที่หนังสือ</label>
+            <input type="text" class="form-control" name="refNo" required></div>
+          <div class="mb-2"><label class="form-label fw-semibold">ลงวันที่</label>
+            <input type="date" class="form-control" name="docDate" required></div>
+          <div class="mb-2"><label class="form-label fw-semibold">เรื่อง</label>
+            <input type="text" class="form-control" name="subject" required></div>
+          <div class="mb-2"><label class="form-label fw-semibold">จากหน่วยงาน</label>
+            <input type="text" class="form-control" name="from" required></div>
+          <div class="mb-2"><label class="form-label fw-semibold">เรียน (ถึงใคร)</label>
+            <input type="text" class="form-control" name="to" value="ผู้อำนวยการโรงเรียน" required></div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">ไฟล์แนบ <small class="text-muted fw-normal">(PDF/รูปภาพ สูงสุด 5 ไฟล์)</small></label>
+            <input type="file" class="form-control" id="docFile"
+                   accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.ppt,.pptx" multiple>
+          </div>
+          <div class="d-grid">
+            <button type="submit" id="btn-submit-reg" class="btn btn-success">
+              <i class="bi bi-save-fill me-1"></i>บันทึกข้อมูล
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: รอง ผอ. พิจารณา -->
+<div class="modal fade" id="modalDeputyReview" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title"><i class="bi bi-pencil-fill me-2"></i>เกษียนหนังสือ (เสนอ ผอ.)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3 p-3 bg-light rounded">
+          <strong id="rev-subject" class="d-block text-primary mb-1"></strong>
+          <small id="rev-ref" class="text-muted d-block mb-2"></small>
+          <div id="rev-files-area"></div>
+        </div>
+        <form id="formDeputyReview">
+          <input type="hidden" id="rev-docId">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">ความเห็น / ข้อเสนอแนะ</label>
+            <textarea class="form-control" id="rev-comment" rows="3" required
+              placeholder="เช่น เห็นควรนำเรียน ผอ. เพื่อพิจารณาสั่งการ..."></textarea>
+          </div>
+          <div class="d-grid">
+            <button type="submit" id="btn-deputy-submit" class="btn btn-warning">
+              <i class="bi bi-send-fill me-1"></i>เสนอ ผอ. พิจารณา
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: ผอ. สั่งการ -->
+<div class="modal fade" id="modalDirectorCommand" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title"><i class="bi bi-megaphone-fill me-2"></i>พิจารณาสั่งการ / มอบหมายงาน</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6 border-end">
+            <h6 class="text-primary" id="dir-subject"></h6>
+            <p class="small text-muted mb-1" id="dir-ref"></p>
+            <div id="dir-files-area" class="mb-3"></div>
+            <div class="alert alert-warning p-2">
+              <small class="fw-semibold">ความเห็น รอง ผอ.:</small><br>
+              <span id="dir-deputy-comment"></span>
             </div>
           </div>
-        </div>
-
-        <div class="tab-pane fade" id="tab-borrow">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="fw-bold text-secondary mb-4"><i class="bi bi-arrow-left-right"></i> ยืม-คืนหนังสือ</h5>
-              
-              <div id="reader-borrow"></div>
-              
+          <div class="col-md-6">
+            <form id="formDirectorCommand">
+              <input type="hidden" id="dir-docId">
               <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">รหัสนักเรียน</label>
-                <input type="number" id="studentId" class="form-control" placeholder="ระบุเลขประจำตัว">
+                <label class="form-label fw-semibold">คำสั่งการ / เกษียนหนังสือ</label>
+                <textarea class="form-control" id="dir-command" rows="3" required
+                  placeholder="เช่น ทราบ มอบงานวิชาการดำเนินการ..."></textarea>
               </div>
-              
-              <div class="mb-4">
-                 <label class="form-label text-muted small fw-bold">ISBN หนังสือ</label>
-                 <div class="input-group">
-                   <input type="text" id="isbnBorrow" class="form-control" placeholder="สแกนบาร์โค้ด">
-                   <button class="btn btn-primary" onclick="toggleScanner('isbnBorrow', 'reader-borrow')"><i class="bi bi-qr-code-scan"></i></button>
-                 </div>
-              </div>
-
-              <div class="row g-2">
-                <div class="col-6">
-                  <button onclick="processTransaction('borrowBook')" class="btn btn-success w-100"><i class="bi bi-box-arrow-up-right"></i> ยืม</button>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">มอบหมายผู้ปฏิบัติงาน</label>
+                <div class="card p-2" style="max-height:200px;overflow-y:auto">
+                  <div id="teacher-checkbox-list">Loading...</div>
                 </div>
-                <div class="col-6">
-                  <button onclick="processTransaction('returnBook')" class="btn btn-secondary w-100"><i class="bi bi-box-arrow-in-down-left"></i> คืน</button>
-                </div>
+                <div class="form-text text-muted">* ไม่เลือก = รับทราบอย่างเดียว</div>
               </div>
-            </div>
+              <div class="d-grid">
+                <button type="submit" id="btn-dir-submit" class="btn btn-danger">
+                  <i class="bi bi-check2-circle me-1"></i>ยืนยันการสั่งการ
+                </button>
+              </div>
+            </form>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        <div class="tab-pane fade" id="tab-add">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-plus-circle-fill"></i> เพิ่มหนังสือใหม่</h5>
-              
-              <div id="reader-add"></div>
+<!-- Modal: รายงานผลการดำเนินงาน -->
+<div class="modal fade" id="modalTaskReport" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="bi bi-send-check-fill me-2"></i>รายงานผลการดำเนินงาน</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3 bg-light p-3 rounded border">
+          <h6 class="fw-bold text-primary mb-1" id="rep-subject"></h6>
+          <small class="text-muted">เลขที่หนังสือ: <span id="rep-command" class="fw-bold text-dark">-</span></small>
+        </div>
+        <div id="box-director-msg" class="alert alert-warning p-2 mb-3 d-none" style="border-left:4px solid #ffc107">
+          <small class="fw-bold"><i class="bi bi-person-fill-exclamation me-1"></i>ข้อสั่งการ ผอ.:</small><br>
+          <span id="rep-director-msg"></span>
+        </div>
+        <form id="formTaskReport">
+          <input type="hidden" id="rep-taskId">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">ผลการปฏิบัติงาน</label>
+            <textarea class="form-control" id="rep-msg" rows="3" required
+              placeholder="ระบุรายละเอียดผลการดำเนินงาน..."></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">แนบหลักฐาน <small class="text-muted fw-normal">(ไม่บังคับ)</small></label>
+            <input type="file" class="form-control" id="repFile" multiple>
+          </div>
+          <div class="d-grid">
+            <button type="submit" id="btn-rep-submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i>ส่งรายงาน
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
-              <form id="addBookForm" onsubmit="submitBook(event)">
-                <div class="mb-3">
-                  <label class="form-label text-muted small fw-bold">ISBN (บาร์โค้ด)</label>
-                  
-                  <div class="input-group">
-                    <input type="text" id="isbnAdd" name="isbn" class="form-control" placeholder="สแกนหรือพิมพ์เลข..." required>
-                    <button class="btn btn-info text-white" type="button" onclick="fetchBookInfo()"><i class="bi bi-search"></i></button>
-                    <button class="btn btn-primary" type="button" onclick="toggleScanner('isbnAdd', 'reader-add')"><i class="bi bi-qr-code"></i></button>
-                  </div>
+<!-- Modal: Tracking Detail -->
+<div class="modal fade" id="modalTrackDetail" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-secondary text-white">
+        <h5 class="modal-title"><i class="bi bi-list-check me-2"></i>รายละเอียดการปฏิบัติงาน</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <h6 id="trk-subject" class="text-primary fw-bold mb-3"></h6>
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered">
+            <thead class="table-light">
+              <tr><th>ผู้ปฏิบัติงาน</th><th>สถานะ</th><th>รายงานผล</th><th>เวลาที่เสร็จ</th></tr>
+            </thead>
+            <tbody id="trk-detail-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-                  <div class="mt-2 d-grid">
-                      <button class="btn btn-outline-dark btn-sm" type="button" onclick="document.getElementById('ocrInput').click()">
-                          <i class="bi bi-camera"></i> ถ่ายรูปหน้าปก (แกะตัวหนังสือ)
-                      </button>
-                      <input type="file" id="ocrInput" accept="image/*" capture="environment" style="display:none" onchange="handleOCR(this)">
-                  </div>
-
-                  <div id="loadingText" class="form-text text-primary mt-2" style="display:none;"></div>
-                </div>
-
-                <div class="mb-2">
-                  <input type="text" id="bookName" name="bookName" class="form-control" placeholder="ชื่อหนังสือ" required>
-                </div>
-                <div class="row g-2 mb-2">
-                    <div class="col-7"><input type="text" id="author" name="author" class="form-control" placeholder="ผู้แต่ง"></div>
-                    <div class="col-5"><input type="text" name="category" class="form-control" placeholder="หมวดหมู่"></div>
-                </div>
-
-                <div class="row g-2 mb-3">
-                   <div class="col-4">
-                      <input type="number" name="qty" class="form-control text-center" placeholder="จำนวน" required value="1">
-                   </div>
-                   <div class="col-8">
-                      <input type="text" id="imgUrl" name="imgUrl" class="form-control" placeholder="URL รูปปก (ถ้ามี)">
-                   </div>
-                </div>
-                
-                <div class="text-center mb-3">
-                    <img id="previewCover" src="" class="book-img shadow-sm" style="display:none; width: 100px; height: auto; margin: 0 auto;">
-                </div>
-
-                <button type="submit" class="btn btn-warning w-100 text-dark fw-bold"><i class="bi bi-save"></i> บันทึกเข้าคลัง</button>
-              </form>
+<!-- Modal: เขียนใบลา -->
+<div class="modal fade" id="modalLeave" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title"><i class="bi bi-calendar2-plus-fill me-2"></i>แบบฟอร์มขอลา</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formLeave">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">ประเภทการลา</label><br>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="leaveType" value="ลาป่วย" checked onchange="leaves.toggleSubArea()">
+              <label class="form-check-label">ป่วย</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="leaveType" value="ลากิจ" onchange="leaves.toggleSubArea()">
+              <label class="form-check-label">กิจส่วนตัว</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="leaveType" value="ลาคลอด" onchange="leaves.toggleSubArea()">
+              <label class="form-check-label">คลอดบุตร</label>
             </div>
           </div>
+          <div class="row">
+            <div class="col-md-4 mb-2"><label class="form-label">ตั้งแต่วันที่</label>
+              <input type="date" class="form-control" name="startDate" required></div>
+            <div class="col-md-4 mb-2"><label class="form-label">ถึงวันที่</label>
+              <input type="date" class="form-control" name="endDate" required></div>
+            <div class="col-md-4 mb-2"><label class="form-label">รวม (วัน)</label>
+              <input type="number" class="form-control" name="totalDays" step="0.5" min="0.5" required></div>
+          </div>
+          <div class="mb-3"><label class="form-label">เนื่องจาก</label>
+            <textarea class="form-control" name="reason" rows="2" required placeholder="ระบุสาเหตุการลา..."></textarea>
+          </div>
+          <div class="mb-3"><label class="form-label">ระหว่างลาติดต่อได้ที่ (เบอร์โทร)</label>
+            <input type="text" class="form-control" name="contact" required></div>
+          <div id="substitute-area" class="d-none border p-3 bg-light rounded mb-3">
+            <h6 class="text-primary fw-bold">บันทึกการฝากสอน (สำหรับลากิจ)</h6>
+            <small class="text-muted d-block mb-2">* กรุณาระบุครูที่รับสอนแทน</small>
+            <div id="sub-rows"></div>
+            <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="leaves.addSubRow()">
+              <i class="bi bi-plus-circle me-1"></i>เพิ่มคาบสอน
+            </button>
+          </div>
+          <div class="d-grid">
+            <button type="submit" id="btn-leave-submit" class="btn btn-success">
+              <i class="bi bi-check2-square me-1"></i>ยืนยันการขอลา
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: อนุมัติใบลา -->
+<div class="modal fade" id="modalApproveAction" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="action-modal-title"><i class="bi bi-clipboard-check me-2"></i>จัดการใบลา</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-light border mb-3">
+          <strong>ผู้ขอ:</strong> <span id="act-name"></span><br>
+          <strong>เหตุผล:</strong> <span id="act-reason" class="text-muted"></span>
         </div>
-
+        <form id="formApproveAction">
+          <input type="hidden" id="act-leaveId">
+          <input type="hidden" id="act-role">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">ความเห็น / บันทึกข้อความ</label>
+            <textarea class="form-control" id="act-comment" rows="2" required
+              placeholder="เช่น ตรวจสอบแล้วถูกต้อง, เห็นควรอนุญาต"></textarea>
+          </div>
+          <div class="d-grid">
+            <button type="submit" id="btn-act-submit" class="btn btn-primary">
+              <i class="bi bi-check-circle-fill me-1"></i>ยืนยัน
+            </button>
+          </div>
+        </form>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="bottom-nav">
-      <div class="nav-item-bottom active" onclick="switchTab('tab-search-btn', this)">
-        <i class="bi bi-search"></i> ค้นหา
-      </div>
-      <div class="nav-item-bottom" onclick="switchTab('tab-borrow-btn', this)">
-        <i class="bi bi-arrow-left-right"></i> ยืม-คืน
-      </div>
-      <div class="nav-item-bottom" onclick="switchTab('tab-add-btn', this)">
-        <i class="bi bi-plus-square"></i> ลงทะเบียน
-      </div>
-    </div>
+<!-- Footer -->
+<footer class="text-center py-4 mt-4 text-muted small">
+  <p class="mb-0">พัฒนาระบบโดย นายมงคล อู๋สูงเนิน</p>
+  <p class="mb-0">ผู้อำนวยการโรงเรียนอนุบาลชุมแสง (วัดทับกฤชกลาง)</p>
+</footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // ==========================================
-      // ⚠️ ใส่ URL API ที่คุณครูให้มาแล้วครับ
-      // ==========================================
-      const API_URL = "https://script.google.com/macros/s/AKfycbwaG0PZs2SSZnDHBtz_WQvDV2aQ4VnTee-owMTu0lw5HYO6cizIlbbRJnxJ486EoJVOrA/exec";
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/documents.js"></script>
+<script src="js/leaves.js"></script>
+<script src="js/app.js"></script>
 
-      // ------------------------------------------
-      // System Functions
-      // ------------------------------------------
-
-      function switchTab(tabId, element) {
-        document.getElementById(tabId).click(); 
-        document.querySelectorAll('.nav-item-bottom').forEach(el => el.classList.remove('active'));
-        element.classList.add('active');
-        stopScan(); 
-      }
-
-      async function callAPI(action, data) {
-        try {
-          // ใช้ no-cors ไม่ได้เพราะเราต้องการอ่าน responseJSON
-          const response = await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: action, ...data })
-          });
-          return await response.json();
-        } catch (error) {
-          console.error("API Error:", error);
-          // Fallback สำหรับบางกรณี
-          try {
-             const res2 = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: action, ...data })
-             });
-             return await res2.json();
-          } catch(err2) {
-             return null;
-          }
-        }
-      }
-
-      // 1. Search Logic
-      window.onload = () => searchBooks();
-
-      async function searchBooks() {
-        let keyword = document.getElementById('searchInput').value;
-        document.getElementById('searchResult').innerHTML = '<div class="text-center mt-4 text-muted"><span class="spinner-border spinner-border-sm"></span> กำลังโหลด...</div>';
-        
-        const res = await callAPI('searchBooks', { keyword: keyword });
-        if(res && res.status) {
-            let html = "";
-            if(res.data.length === 0) html = `<div class="text-center mt-5 text-muted"><i class="bi bi-inbox fs-1"></i><p>ไม่พบข้อมูล</p></div>`;
-            
-            res.data.forEach(row => {
-              let isAvail = row[5] > 0;
-              let badge = isAvail ? `<span class="badge bg-success bg-opacity-10 text-success rounded-pill">ว่าง ${row[5]}</span>` : `<span class="badge bg-danger bg-opacity-10 text-danger rounded-pill">หมด</span>`;
-              let img = row[6] ? `<img src="${row[6]}" class="book-img">` : `<div class="book-img d-flex align-items-center justify-content-center bg-light text-muted"><i class="bi bi-image"></i></div>`;
-              
-              html += `
-              <div class="list-group-item d-flex align-items-center px-0 py-3 border-bottom bg-transparent">
-                <div class="me-3">${img}</div>
-                <div class="flex-grow-1">
-                    <h6 class="fw-bold mb-1 text-dark">${row[1]}</h6>
-                    <div class="text-muted small">
-                        <i class="bi bi-person"></i> ${row[2]} <br>
-                        <span class="text-secondary" style="font-size:0.75rem">ISBN: ${row[0]}</span>
-                    </div>
-                </div>
-                <div class="ms-2">${badge}</div>
-              </div>`;
-            });
-            document.getElementById('searchResult').innerHTML = html;
-        }
-      }
-
-      // 2. Transaction Logic
-      async function processTransaction(actionStr) {
-        let sid = document.getElementById('studentId').value;
-        let isbn = document.getElementById('isbnBorrow').value;
-        if(!sid || !isbn) return Swal.fire('แจ้งเตือน', 'กรุณาระบุรหัสนักเรียนและ ISBN', 'warning');
-        
-        Swal.fire({title: 'ประมวลผล...', didOpen: () => Swal.showLoading()});
-        const res = await callAPI(actionStr, { studentId: sid, isbn: isbn });
-        
-        if(res && res.status) { 
-            Swal.fire('สำเร็จ', res.msg, 'success'); 
-            document.getElementById('isbnBorrow').value = ''; 
-            searchBooks(); 
-        } else { 
-            Swal.fire('ผิดพลาด', res ? res.msg : 'เชื่อมต่อไม่ได้', 'error'); 
-        }
-      }
-
-      // 3. Add Book Logic (Smart Fetch)
-      async function fetchBookInfo() {
-        const isbn = document.getElementById('isbnAdd').value.trim();
-        if(isbn.length < 5) {
-            Swal.fire('แจ้งเตือน', 'กรุณากรอกเลข ISBN', 'warning');
-            return;
-        }
-
-        const loader = document.getElementById('loadingText');
-        loader.style.display = 'block';
-        loader.innerHTML = '<span class="spinner-border spinner-border-sm"></span> กำลังดึงข้อมูลจากทุกแหล่ง (หอสมุด/Google/OpenLib)...';
-
-        // เรียก API เดียว จบครบทุกอย่าง
-        const res = await callAPI('smartSearchBook', { isbn: isbn });
-
-        loader.style.display = 'none';
-
-        if(res && res.status) {
-            document.getElementById('bookName').value = res.title || "";
-            document.getElementById('author').value = res.author || "";
-            document.querySelector('input[name="category"]').value = res.category || "";
-            if(res.imgUrl) {
-                document.getElementById('imgUrl').value = res.imgUrl;
-                document.getElementById('previewCover').src = res.imgUrl;
-                document.getElementById('previewCover').style.display = 'block';
-            }
-            if(res.source === 'local') notify('พบข้อมูลในคลังเดิม');
-            else if(res.source === 'nlt') notify('พบข้อมูลจากหอสมุดแห่งชาติ');
-            else notify('พบข้อมูลจาก Google Books');
-        } else {
-             Swal.fire({icon: 'info', title: 'ไม่พบข้อมูล', text: 'กรุณากรอกข้อมูลด้วยตัวเอง', timer: 2000, showConfirmButton: false});
-        }
-      }
-
-      function notify(msg) {
-          Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000}).fire({icon: 'success', title: msg});
-      }
-
-      async function submitBook(e) {
-        e.preventDefault();
-        Swal.fire({title: 'บันทึก...', didOpen: () => Swal.showLoading()});
-        
-        const formData = new FormData(document.getElementById("addBookForm"));
-        const res = await callAPI('addNewBook', { formObject: Object.fromEntries(formData.entries()) });
-        
-        if(res && res.status) {
-           Swal.fire('เรียบร้อย', res.msg, 'success');
-           document.getElementById("addBookForm").reset();
-           document.getElementById('previewCover').style.display = 'none';
-           searchBooks();
-        }
-      }
-
-      // 4. OCR Logic (ระบบอ่านภาพ)
-      async function handleOCR(input) {
-        if (input.files && input.files[0]) {
-            const file = input.files[0];
-            
-            Swal.fire({
-                title: 'กำลังแกะตัวหนังสือ...',
-                text: 'กรุณารอสักครู่ (3-5 วินาที)',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            // ย่อรูปก่อนส่ง
-            const resizedBase64 = await resizeImage(file, 800); 
-
-            // ส่งไปให้ GAS ประมวลผล
-            const res = await callAPI('scanImage', { imageBase64: resizedBase64 });
-
-            if (res && res.status) {
-                Swal.close();
-                if (res.title) document.getElementById('bookName').value = res.title;
-                if (res.author) document.getElementById('author').value = res.author;
-                if (res.isbn) document.getElementById('isbnAdd').value = res.isbn;
-                
-                Swal.fire({
-                    icon: 'success',
-                    title: 'อ่านข้อมูลสำเร็จ!',
-                    html: `<b>ชื่อเรื่อง:</b> ${res.title}<br><b>ผู้แต่ง:</b> ${res.author}<br><small class="text-muted">ตรวจสอบความถูกต้องอีกครั้งนะครับ</small>`
-                });
-           } else {
-                Swal.fire('ข้อผิดพลาด', res ? res.msg : 'เชื่อมต่อไม่ได้', 'error');
-            }
-            input.value = ''; 
-        }
-      }
-
-      function resizeImage(file, maxWidth) {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    if (width > maxWidth) {
-                        height *= maxWidth / width;
-                        width = maxWidth;
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.7));
-                };
-            };
-        });
-      }
-
-      // 5. Camera Scanner Logic
-      let html5QrCode = null; 
-      let currentReaderId = null;
-
-      function toggleScanner(inputId, readerId) {
-        if (html5QrCode && html5QrCode.isScanning && currentReaderId === readerId) { 
-            stopScan(); 
-        } else { 
-            startScan(inputId, readerId); 
-        }
-      }
-
-      function startScan(inputId, readerId) {
-        if (html5QrCode && html5QrCode.isScanning) stopScan();
-        
-        const readerElement = document.getElementById(readerId);
-        readerElement.style.display = 'block';
-        
-        html5QrCode = new Html5Qrcode(readerId);
-        currentReaderId = readerId;
-        
-        const onScanSuccess = (decodedText) => {
-            document.getElementById(inputId).value = decodedText;
-            if (window.navigator.vibrate) window.navigator.vibrate(200);
-            stopScan();
-            
-            // ✅ ถ้าเป็นการสแกนเพื่อเพิ่มหนังสือ ให้ดึงข้อมูลทันที (Auto Fetch)
-            if(inputId === 'isbnAdd') {
-                setTimeout(() => fetchBookInfo(), 500); 
-            }
-        };
-
-        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 150 } }, onScanSuccess)
-        .catch(() => {
-            html5QrCode.start({ facingMode: "user" }, { fps: 10, qrbox: { width: 250, height: 150 } }, onScanSuccess)
-            .catch(() => Swal.fire('กล้องไม่พร้อม', 'กรุณาอนุญาตการใช้กล้อง', 'error'));
-        });
-      }
-
-      function stopScan() {
-        if (html5QrCode && html5QrCode.isScanning) {
-            html5QrCode.stop().then(() => { 
-                html5QrCode.clear(); 
-                if(currentReaderId) document.getElementById(currentReaderId).style.display = 'none'; 
-            });
-        }
-      }
-    </script>
-  </body>
+</body>
 </html>
