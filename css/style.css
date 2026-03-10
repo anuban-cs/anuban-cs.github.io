@@ -1,0 +1,238 @@
+/* ============================================================
+   style.css — E-Saraban Custom Styles
+   โรงเรียนอนุบาลชุมแสง (วัดทับกฤชกลาง)
+   ============================================================ */
+
+/* --- Google Font --- */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Kanit:wght@400;500;600&display=swap');
+
+/* --- CSS Variables --- */
+:root {
+  --primary:     #1a56a0;
+  --primary-lt:  #e8f0fb;
+  --success:     #1a7f4b;
+  --warning:     #d68910;
+  --danger:      #c0392b;
+  --bg:          #f0f4f8;
+  --card-shadow: 0 2px 12px rgba(26, 86, 160, 0.10);
+  --radius:      12px;
+  --transition:  0.2s ease;
+}
+
+/* --- Base --- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background-color: var(--bg);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 1rem;
+  color: #1a2332;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6,
+.navbar-brand, .fw-bold { font-family: 'Kanit', 'Sarabun', sans-serif; }
+
+/* --- Utility --- */
+.hidden { display: none !important; }
+
+/* --- Login Card --- */
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a3a6b 0%, #1a56a0 50%, #2471c8 100%);
+  padding: 20px;
+}
+
+.login-card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+
+.login-logo {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, var(--primary), #2471c8);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+  color: white; font-size: 2rem;
+  box-shadow: 0 8px 20px rgba(26,86,160,0.35);
+}
+
+.login-card .form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(26,86,160,0.15);
+}
+
+/* --- Navbar --- */
+.navbar {
+  background: linear-gradient(90deg, #1a3a6b, #1a56a0) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  padding: 10px 0;
+}
+.navbar-brand {
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+/* --- Cards --- */
+.card {
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(26,86,160,0.08);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.menu-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(26, 86, 160, 0.18);
+}
+
+.menu-card .btn {
+  border-radius: 8px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* --- Welcome Card --- */
+.welcome-card {
+  background: linear-gradient(120deg, #1a56a0, #2471c8);
+  color: white;
+  border: none;
+}
+.welcome-card .text-muted { color: rgba(255,255,255,0.75) !important; }
+.welcome-card .role-badge {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  backdrop-filter: blur(4px);
+}
+
+/* --- Role Badge --- */
+.role-badge {
+  font-size: 0.82em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(26,86,160,0.1);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+/* --- Tables --- */
+.table { font-size: 0.95rem; }
+.table thead th {
+  background: #f8f9fb;
+  font-weight: 600;
+  color: #4a5568;
+  border-bottom: 2px solid rgba(26,86,160,0.1);
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.table-hover tbody tr:hover { background: var(--primary-lt); }
+
+/* --- Section Headers --- */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.section-header h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* --- Modals --- */
+.modal-content { border-radius: var(--radius); border: none; }
+.modal-header  { border-radius: var(--radius) var(--radius) 0 0; }
+
+/* --- Progress Bars --- */
+.progress { border-radius: 20px; overflow: hidden; }
+.progress-bar { font-size: 0.8rem; font-weight: 600; }
+
+/* --- Buttons --- */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+.btn:active { transform: scale(0.97); }
+
+/* --- Alerts --- */
+.alert { border-radius: 10px; }
+
+/* --- Search Input --- */
+#search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(26,86,160,0.12);
+}
+
+/* --- Task Cards --- */
+.task-card-border { border-left: 4px solid var(--primary) !important; }
+
+/* --- Stats Chart Container --- */
+#leaveChart { min-height: 400px; }
+
+/* --- Loading Skeleton --- */
+.skeleton {
+  background: linear-gradient(90deg, #e8ecf0 25%, #f5f7f9 50%, #e8ecf0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.4s ease infinite;
+  border-radius: 6px;
+}
+@keyframes skeleton-wave {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* --- Spinner inside button --- */
+.spinner-border-sm { width: 1em; height: 1em; }
+
+/* --- Back Button --- */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #6c757d;
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  background: white;
+  transition: all var(--transition);
+}
+.btn-back:hover {
+  background: var(--primary-lt);
+  color: var(--primary);
+  border-color: var(--primary);
+  text-decoration: none;
+}
+
+/* --- Orange Badge (custom) --- */
+.bg-orange { background-color: #e67e22 !important; }
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .login-card { padding: 28px 20px; }
+  .table { font-size: 0.85rem; }
+  .section-header { flex-direction: column; align-items: flex-start; }
+  .menu-card .bi { font-size: 1.6rem !important; }
+}
+
+@media (max-width: 576px) {
+  .modal-dialog { margin: 10px; }
+  .modal-dialog.modal-lg { max-width: calc(100vw - 20px); }
+}
