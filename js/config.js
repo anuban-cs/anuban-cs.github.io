@@ -8,7 +8,7 @@
 // ============================================================
 
 const APP_CONFIG = {
-  GAS_URL: 'https://script.google.com/macros/s/AKfycbzuDNNdRxqKm0da5K40Nf1kTr3ymScgwyOWa8ZYZBkrG6S7KLbulXlqY6lmyvqbSAV2/exec',
+  GAS_URL: 'https://script.google.com/macros/s/AKfycbyctcCgNF2sia39w-bSaKjqC_i7ZC1UeOis7zlLF4nmMajfg1SLkOZsrhJcncG8ne_5/exec',
   APP_NAME: 'ระบบสารบรรณอิเล็กทรอนิกส์',
   SCHOOL_NAME: 'โรงเรียนอนุบาลชุมแสง (วัดทับกฤชกลาง)',
   SESSION_KEY: 'esaraban_session',
