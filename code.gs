@@ -71,6 +71,17 @@ function doPost(e) {
       case 'getMyLeaves':             res = getMyLeaves(body.userId); break;
       case 'requestCancelLeave':      res = requestCancelLeave(body.leaveId, body.userId); break;
       case 'getAllTeacherStats':       res = getAllTeacherStats(); break;
+      // ── Acting Director ──
+      case 'setActingDirector':       res = setActingDirector(body.date, body.userId); break;
+      case 'getActingDirectorList':   res = getActingDirectorList(); break;
+      // ── Out Permission ──
+      case 'submitOutPermission':     res = submitOutPermission(body.form); break;
+      case 'approveOutPermission':    res = approveOutPermission(body.outId, body.userId); break;
+      case 'rejectOutPermission':     res = rejectOutPermission(body.outId, body.userId, body.reason); break;
+      case 'getOutPermissions':       res = getOutPermissions(body.role, body.userId); break;
+      // ── Leave Stats (AcademicHead/PersonnelHead) ──
+      case 'getLeaveStats':           res = getLeaveStats(body.role); break;
+      case 'getPersonnelDashboard':   res = getPersonnelDashboard(); break;
       default: res = { status: 'error', message: 'Unknown action: ' + act };
     }
     return jsonOut(res);
@@ -766,3 +777,290 @@ function TEST_groupAnnounceFlex() {
       cfg.SCHOOL_NAME));
 }
 function TEST_drive(){Logger.log(DriveApp.getFolderById(getConfig().DRIVE_FOLDER_ID).getName());}
+
+
+// ═══════════════════════════════════════════════════════════════
+//  ACTING DIRECTOR — ผู้รักษาการผู้อำนวยการ
+// ═══════════════════════════════════════════════════════════════
+
+/** ดึง userId ของผู้รักษาการ ณ วันนี้
+ *  Sheet "ActingDirector" columns: A=Date, B=UserId
+ *  ถ้าไม่มีรักษาการวันนั้น → ใช้ Director จริง
+ */
+function getActingDirectorId() {
+  var tz  = Session.getScriptTimeZone();
+  var today = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
+  try {
+    var sh   = ssheet().getSheetByName('ActingDirector');
+    if (!sh) return null; // ไม่มี Sheet → ใช้ Director จริง
+    var rows = sh.getDataRange().getValues();
+    for (var i = 1; i < rows.length; i++) {
+      var d = Utilities.formatDate(new Date(rows[i][0]), tz, 'yyyy-MM-dd');
+      if (d === today && rows[i][1]) return rows[i][1].toString();
+    }
+  } catch(e) { Logger.log('getActingDirectorId: '+e); }
+  return null;
+}
+
+/** ส่ง Line ถึงผู้รักษาการ (ถ้าไม่มี → ส่งถึง Director จริง)
+ *  @param {string} alt    alt text
+ *  @param {Object} bubble Flex bubble (ถ้าไม่ส่งจะเป็น text)
+ *  @param {string} text   ข้อความธรรมดา (ถ้าไม่ใช้ Flex)
+ */
+function notifyActingOrDirector(alt, bubble, text) {
+  var actId = getActingDirectorId();
+  if (actId) {
+    // มีรักษาการ → ส่งหารักษาการ
+    if (bubble) lineFlex(actId, alt, bubble);
+    else        lineText(actId, text);
+  } else {
+    // ไม่มีรักษาการ → ส่งหา Director ทุกคน
+    if (bubble) notifyRoleFlex('Director', alt, bubble);
+    else        notifyRole('Director', text);
+  }
+}
+
+/** CRUD ActingDirector */
+function setActingDirector(date, userId) {
+  var sh = ssheet().getSheetByName('ActingDirector');
+  if (!sh) return {status:'error', message:'ไม่พบ Sheet ActingDirector'};
+  var tz   = Session.getScriptTimeZone();
+  var dStr = Utilities.formatDate(new Date(date), tz, 'yyyy-MM-dd');
+  var rows = sh.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    var d = Utilities.formatDate(new Date(rows[i][0]), tz, 'yyyy-MM-dd');
+    if (d === dStr) {
+      sh.getRange(i+1, 2).setValue(userId);
+      return {status:'success', message:'อัปเดตรักษาการเรียบร้อย'};
+    }
+  }
+  sh.appendRow([date, userId]);
+  return {status:'success', message:'บันทึกรักษาการเรียบร้อย'};
+}
+
+function getActingDirectorList() {
+  var sh = ssheet().getSheetByName('ActingDirector');
+  if (!sh) return [];
+  var rows = sh.getDataRange().getValues();
+  var uRows = ssheet().getSheetByName('Users').getDataRange().getValues();
+  var uMap = {};
+  for (var u=1;u<uRows.length;u++) uMap[uRows[u][0]] = uRows[u][3];
+  var tz = Session.getScriptTimeZone();
+  var out = [];
+  for (var i=1;i<rows.length;i++) {
+    if (!rows[i][0]) continue;
+    out.push({
+      date:   Utilities.formatDate(new Date(rows[i][0]), tz, 'dd/MM/yyyy'),
+      userId: rows[i][1],
+      name:   uMap[rows[i][1]] || rows[i][1]
+    });
+  }
+  return out.reverse(); // ล่าสุดก่อน
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  OUT PERMISSION — ขออนุญาตออกนอกโรงเรียน
+// ═══════════════════════════════════════════════════════════════
+
+function submitOutPermission(form) {
+  var cfg  = getConfig();
+  var sh   = ssheet().getSheetByName('OutPermissions');
+  var tz   = Session.getScriptTimeZone();
+  var user = getUserInfo(form.userId);
+  var newId = 'OUT-' + Utilities.formatDate(new Date(), tz, 'yyMMddHHmmss');
+
+  sh.appendRow([
+    newId, form.userId,
+    form.date, form.timeOut, form.timeReturn,
+    form.destination, form.reason, form.contact,
+    'รอนุมัติ', new Date()
+  ]);
+
+  // Flex Card แจ้งผู้อำนวยการ หรือ รักษาการ
+  var timeStr = form.timeOut + ' — ' + form.timeReturn;
+  var bubble  = buildOutPermissionFlex(
+    user.name, form.date, timeStr,
+    form.destination, form.reason, cfg.SCHOOL_NAME, cfg.APP_URL
+  );
+  var alt = '🚗 '+user.name+' ขออนุญาตออกนอกโรงเรียน';
+  notifyActingOrDirector(alt, bubble, null);
+
+  // แจ้ง Admin ด้วย (text)
+  notifyRole('Admin',
+    '🚗 '+user.name+' ขออนุญาตออกนอกโรงเรียน
+'
+    +'📅 '+form.date+' เวลา '+timeStr+'
+'
+    +'📍 '+form.destination+'
+'
+    +'เหตุผล: '+form.reason);
+
+  return {status:'success', message:'บันทึกคำขอเรียบร้อยแล้ว'};
+}
+
+function approveOutPermission(outId, approverId) {
+  var sh   = ssheet().getSheetByName('OutPermissions');
+  var rows = sh.getDataRange().getValues();
+  for (var i=1;i<rows.length;i++) {
+    if (rows[i][0] != outId) continue;
+    sh.getRange(i+1, 9).setValue('อนุมัติ');
+    sh.getRange(i+1,11).setValue(approverId);
+    var user = getUserInfo(rows[i][1]);
+    var lid  = getLineId(rows[i][1]);
+    if (lid) lineText(lid,
+      '✅ คำขอออกนอกโรงเรียนของคุณได้รับการอนุมัติแล้ว
+'
+      +'📅 '+rows[i][2]+' เวลา '+rows[i][3]+' — '+rows[i][4]+'
+'
+      +'📍 '+rows[i][5]);
+    return {status:'success', message:'อนุมัติเรียบร้อย'};
+  }
+  return {status:'error', message:'ไม่พบคำขอ'};
+}
+
+function rejectOutPermission(outId, approverId, reason) {
+  var sh   = ssheet().getSheetByName('OutPermissions');
+  var rows = sh.getDataRange().getValues();
+  for (var i=1;i<rows.length;i++) {
+    if (rows[i][0] != outId) continue;
+    sh.getRange(i+1, 9).setValue('ไม่อนุมัติ');
+    sh.getRange(i+1,11).setValue(approverId);
+    var lid = getLineId(rows[i][1]);
+    if (lid) lineText(lid,
+      '❌ คำขอออกนอกโรงเรียนไม่ได้รับการอนุมัติ
+'
+      +'📅 '+rows[i][2]+'
+'
+      +'เหตุผล: '+reason);
+    return {status:'success', message:'ไม่อนุมัติเรียบร้อย'};
+  }
+  return {status:'error', message:'ไม่พบคำขอ'};
+}
+
+function getOutPermissions(role, userId) {
+  var sh    = ssheet().getSheetByName('OutPermissions');
+  var rows  = sh.getDataRange().getValues();
+  var uRows = ssheet().getSheetByName('Users').getDataRange().getValues();
+  var uMap  = {};
+  for (var u=1;u<uRows.length;u++) uMap[uRows[u][0]] = uRows[u][3];
+  var out = [];
+  for (var i=rows.length-1;i>=1;i--) {
+    if (role==='Teacher' && rows[i][1]!=userId) continue;
+    out.push({
+      id:          rows[i][0],
+      requester:   uMap[rows[i][1]] || rows[i][1],
+      date:        rows[i][2],
+      timeOut:     rows[i][3],
+      timeReturn:  rows[i][4],
+      destination: rows[i][5],
+      reason:      rows[i][6],
+      status:      rows[i][8]
+    });
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FLEX BUILDER — ขออนุญาตออกนอกโรงเรียน
+// ═══════════════════════════════════════════════════════════════
+function buildOutPermissionFlex(requester, date, timeStr, destination, reason, schoolName, appUrl) {
+  return {
+    type:'bubble', size:'kilo',
+    header:{
+      type:'box', layout:'horizontal', paddingAll:'14px',
+      backgroundColor:'#2d6a4f', spacing:'md',
+      contents:[
+        {type:'text', text:'🚗', size:'xxl', flex:0},
+        {type:'box', layout:'vertical', flex:1, contents:[
+          {type:'text', text:'ขออนุญาตออกนอกโรงเรียน',
+            color:'#fff', size:'sm', weight:'bold'},
+          {type:'text', text:schoolName,
+            color:'rgba(255,255,255,0.7)', size:'xxs', margin:'xs'}
+        ]}
+      ]
+    },
+    body:{
+      type:'box', layout:'vertical', paddingAll:'16px', spacing:'md',
+      contents:[
+        {type:'text', text:requester, size:'xl', weight:'bold', color:'#1a202c'},
+        {type:'box', layout:'vertical', paddingAll:'12px',
+          backgroundColor:'#f0faf4', cornerRadius:'10px', spacing:'sm',
+          contents:[
+            _row('วันที่',     date),
+            _row('เวลา',      timeStr),
+            _row('สถานที่',   destination)
+          ]},
+        {type:'box', layout:'vertical', paddingAll:'10px',
+          backgroundColor:'#f7fafc', cornerRadius:'8px',
+          contents:[
+            {type:'text', text:'💬 เหตุผล', size:'xs', color:'#666', weight:'bold'},
+            {type:'text', text:reason||'-', size:'sm', color:'#333', wrap:true, margin:'xs'}
+          ]}
+      ]
+    },
+    footer: appUrl ? {
+      type:'box', layout:'vertical', paddingAll:'12px',
+      contents:[{type:'button', style:'primary', color:'#2d6a4f', height:'sm',
+        action:{type:'uri', label:'✅ เข้าระบบอนุมัติ', uri:appUrl}}]
+    } : undefined
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LEAVE STATS — สำหรับ AcademicHead และ PersonnelHead
+// ═══════════════════════════════════════════════════════════════
+function getLeaveStats(role) {
+  var lRows = ssheet().getSheetByName('Leaves').getDataRange().getValues();
+  var uRows = ssheet().getSheetByName('Users').getDataRange().getValues();
+  var uMap  = {};
+  for (var u=1;u<uRows.length;u++) uMap[uRows[u][0]] = uRows[u][3];
+  var tz = Session.getScriptTimeZone();
+  var out = [];
+  // แสดงเฉพาะที่อนุมัติแล้ว
+  for (var i=lRows.length-1;i>=1;i--) {
+    if (lRows[i][9] !== 'อนุมัติ') continue;
+    out.push({
+      id:        lRows[i][0],
+      requester: uMap[lRows[i][1]] || lRows[i][1],
+      type:      lRows[i][2],
+      startDate: Utilities.formatDate(new Date(lRows[i][3]), tz, 'dd/MM/yyyy'),
+      endDate:   Utilities.formatDate(new Date(lRows[i][4]), tz, 'dd/MM/yyyy'),
+      days:      lRows[i][5],
+      reason:    lRows[i][6],
+      status:    lRows[i][9]
+    });
+  }
+  return out;
+}
+
+function getPersonnelDashboard() {
+  var lRows = ssheet().getSheetByName('Leaves').getDataRange().getValues();
+  var uRows = ssheet().getSheetByName('Users').getDataRange().getValues();
+  var st    = {};
+  for (var u=1;u<uRows.length;u++) {
+    if (uRows[u][4] !== 'Director')
+      st[uRows[u][0]] = {
+        name: uRows[u][3], position: uRows[u][5],
+        sick:0, personal:0, birth:0, total:0,
+        history:[]
+      };
+  }
+  var tz = Session.getScriptTimeZone();
+  for (var i=1;i<lRows.length;i++) {
+    var uid = lRows[i][1];
+    if (!st[uid] || lRows[i][9]!=='อนุมัติ') continue;
+    var d = parseFloat(lRows[i][5])||0;
+    if (lRows[i][2]==='ลาป่วย')  st[uid].sick     += d;
+    if (lRows[i][2]==='ลากิจ')   st[uid].personal += d;
+    if (lRows[i][2]==='ลาคลอด') st[uid].birth    += d;
+    st[uid].total += d;
+    st[uid].history.push({
+      type:      lRows[i][2],
+      startDate: Utilities.formatDate(new Date(lRows[i][3]), tz, 'dd/MM/yyyy'),
+      endDate:   Utilities.formatDate(new Date(lRows[i][4]), tz, 'dd/MM/yyyy'),
+      days:      lRows[i][5]
+    });
+  }
+  return Object.keys(st).map(function(k){return st[k];})
+    .sort(function(a,b){return b.total-a.total;});
+}
