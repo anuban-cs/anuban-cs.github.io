@@ -22,7 +22,7 @@ const api = (() => {
       ...params,
       // แนบ session token ทุก request (ยกเว้น checkLogin)
       ...(session && action !== 'checkLogin' ? {
-        sessionToken: session.token,
+        sessionToken: session.sessionToken || session.token,
         userId: session.user.id
       } : {})
     };

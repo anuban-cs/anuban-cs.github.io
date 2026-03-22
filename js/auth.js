@@ -10,7 +10,7 @@ const auth = (() => {
   function saveSession(user, token) {
     const session = {
       user,
-      token,
+      sessionToken: token,
       expiresAt: Date.now() + (APP_CONFIG.SESSION_TIMEOUT_HOURS * 3600 * 1000)
     };
     localStorage.setItem(APP_CONFIG.SESSION_KEY, JSON.stringify(session));
