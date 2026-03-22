@@ -7,12 +7,12 @@ const acting = (() => {
   async function openModal() {
     router.showOnly('outperm-section');
     const user = auth.getUser();
-    ui.showLoading('กำลังโหลด...');
+    showLoading('กำลังโหลด...');
     const [teachers, actingList] = await Promise.all([
       api.call('getTeacherList', auth.getSessionParams()),
       api.call('getActingDirectorList', auth.getSessionParams())
     ]);
-    ui.hideLoading();
+    hideLoading();
 
     const allUsers = [...(teachers || [])];
 
@@ -83,17 +83,17 @@ const acting = (() => {
   async function save() {
     const date   = document.getElementById('acting-date').value;
     const userId = document.getElementById('acting-user').value;
-    if (!date || !userId) { ui.toast.warning('กรุณาเลือกวันที่และผู้รักษาการ'); return; }
+    if (!date || !userId) { toast.warning('กรุณาเลือกวันที่และผู้รักษาการ'); return; }
 
-    ui.showLoading('กำลังบันทึก...');
+    showLoading('กำลังบันทึก...');
     const res = await api.call('setActingDirector', { date, userId, ...auth.getSessionParams() });
-    ui.hideLoading();
+    hideLoading();
 
     if (res.status === 'success') {
-      ui.toast.success(res.message);
+      toast.success(res.message);
       openModal(); // reload
     } else {
-      ui.toast.error(res.message);
+      toast.error(res.message);
     }
   }
 

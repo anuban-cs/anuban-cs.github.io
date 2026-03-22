@@ -81,17 +81,17 @@ const outperm = (() => {
       contact:     document.getElementById('out-contact').value.trim()
     };
 
-    ui.showLoading('กำลังส่งคำขอ...');
+    showLoading('กำลังส่งคำขอ...');
     const res = await api.call('submitOutPermission', { form, ...auth.getSessionParams() });
-    ui.hideLoading();
+    hideLoading();
 
     if (res.status === 'success') {
-      ui.toast.success(res.message);
+      toast.success(res.message);
       document.getElementById('formOutPerm').reset();
       document.getElementById('out-date').value = new Date().toISOString().split('T')[0];
       loadMyOutPerms();
     } else {
-      ui.toast.error(res.message);
+      toast.error(res.message);
     }
   }
 
@@ -114,7 +114,7 @@ const outperm = (() => {
               <td>${r.timeOut} — ${r.timeReturn}</td>
               <td>${r.destination}</td>
               <td class="text-muted small">${r.reason}</td>
-              <td>${ui.statusBadge(r.status)}</td>
+              <td>${statusBadge(r.status)}</td>
             </tr>
           `).join('')}</tbody>
         </table>
@@ -128,9 +128,9 @@ const outperm = (() => {
   async function loadApprovals() {
     router.showOnly('outperm-section');
     const user = auth.getUser();
-    ui.showLoading('กำลังโหลด...');
+    showLoading('กำลังโหลด...');
     const res = await api.call('getOutPermissions', { role: user.role, userId: user.id, ...auth.getSessionParams() });
-    ui.hideLoading();
+    hideLoading();
 
     const pending = (res || []).filter(r => r.status === 'รอนุมัติ');
     const done    = (res || []).filter(r => r.status !== 'รอนุมัติ');
@@ -180,7 +180,7 @@ const outperm = (() => {
               <td>${r.requester}</td>
               <td>${r.date}</td>
               <td>${r.destination}</td>
-              <td>${ui.statusBadge(r.status)}</td>
+              <td>${statusBadge(r.status)}</td>
             </tr>
           `).join('')}</tbody>
         </table>
@@ -189,13 +189,13 @@ const outperm = (() => {
   }
 
   async function approve(outId) {
-    const confirmed = await ui.confirmDialog('ยืนยันอนุมัติคำขอนี้?');
+    const confirmed = await confirmDialog('ยืนยันอนุมัติคำขอนี้?');
     if (!confirmed) return;
     const user = auth.getUser();
-    ui.showLoading('กำลังอนุมัติ...');
+    showLoading('กำลังอนุมัติ...');
     const res = await api.call('approveOutPermission', { outId, ...auth.getSessionParams() });
-    ui.hideLoading();
-    res.status === 'success' ? ui.toast.success(res.message) : ui.toast.error(res.message);
+    hideLoading();
+    res.status === 'success' ? toast.success(res.message) : toast.error(res.message);
     loadApprovals();
   }
 
@@ -203,10 +203,10 @@ const outperm = (() => {
     const reason = prompt('ระบุเหตุผลที่ไม่อนุมัติ:');
     if (!reason) return;
     const user = auth.getUser();
-    ui.showLoading('กำลังบันทึก...');
+    showLoading('กำลังบันทึก...');
     const res = await api.call('rejectOutPermission', { outId, reason, ...auth.getSessionParams() });
-    ui.hideLoading();
-    res.status === 'success' ? ui.toast.success(res.message) : ui.toast.error(res.message);
+    hideLoading();
+    res.status === 'success' ? toast.success(res.message) : toast.error(res.message);
     loadApprovals();
   }
 
@@ -216,9 +216,9 @@ const outperm = (() => {
   async function loadLeaveStats() {
     router.showOnly('outperm-section');
     const user = auth.getUser();
-    ui.showLoading('กำลังโหลด...');
+    showLoading('กำลังโหลด...');
     const res = await api.call('getLeaveStats', { role: user.role, ...auth.getSessionParams() });
-    ui.hideLoading();
+    hideLoading();
 
     document.getElementById('outperm-form-area').innerHTML = `
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -256,9 +256,9 @@ const outperm = (() => {
   // ============================================================
   async function loadPersonnelDashboard() {
     router.showOnly('outperm-section');
-    ui.showLoading('กำลังโหลด Dashboard...');
+    showLoading('กำลังโหลด Dashboard...');
     const res = await api.call('getPersonnelDashboard', auth.getSessionParams());
-    ui.hideLoading();
+    hideLoading();
 
     const maxDays = Math.max(...(res || []).map(r => r.total), 1);
 

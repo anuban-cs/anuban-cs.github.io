@@ -104,5 +104,12 @@ const auth = (() => {
     return false;
   }
 
-  return { handleLogin, logout, getSession, getUser, checkAutoLogin };
+  // Helper — ส่ง sessionToken + userId ไปกับทุก API call
+  function getSessionParams() {
+    const s = getSession();
+    if (!s) return {};
+    return { sessionToken: s.sessionToken, userId: s.user.id };
+  }
+
+  return { handleLogin, logout, getSession, getUser, checkAutoLogin, getSessionParams };
 })();
