@@ -247,3 +247,9 @@ function confirmDialog(message) {
     });
   });
 }
+
+// ============================================================
+// GLOBAL ALIASES — ให้ไฟล์อื่นเรียกใช้ได้สะดวก
+// ============================================================
+const showLoading = (text) => loader.show(text);
+const hideLoading = ()     => loader.hide();
