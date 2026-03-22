@@ -10,9 +10,15 @@ const outperm = (() => {
   function openSubmitModal() {
     router.showOnly('outperm-section');
     document.getElementById('outperm-form-area').innerHTML = `
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5><i class="bi bi-door-open-fill me-2 text-success"></i>ขออนุญาตออกนอกโรงเรียน</h5>
+        <button class="btn btn-sm btn-secondary" onclick="app.showDashboard(auth.getUser())">
+          <i class="bi bi-arrow-left me-1"></i>กลับหน้าหลัก
+        </button>
+      </div>
       <div class="card shadow-sm">
         <div class="card-header bg-success text-white">
-          <h5 class="mb-0"><i class="bi bi-door-open-fill me-2"></i>ขออนุญาตออกนอกโรงเรียน</h5>
+          <h5 class="mb-0"><i class="bi bi-door-open-fill me-2"></i>กรอกคำขออนุญาต</h5>
         </div>
         <div class="card-body">
           <form id="formOutPerm">
