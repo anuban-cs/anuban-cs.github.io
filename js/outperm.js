@@ -2,6 +2,18 @@
 // js/outperm.js — Out Permission + Acting Director + Leave Stats
 // ============================================================
 
+// แปลงวันที่เป็นรูปแบบไทย
+function formatThaiDate(dateStr) {
+  if (!dateStr) return '-';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr; // ถ้าแปลงไม่ได้ คืนค่าเดิม
+    return d.toLocaleDateString('th-TH', {
+      year: 'numeric', month: 'short', day: 'numeric'
+    });
+  } catch(e) { return dateStr; }
+}
+
 const outperm = (() => {
 
   // ============================================================
@@ -116,8 +128,8 @@ const outperm = (() => {
           </tr></thead>
           <tbody>${res.map(r => `
             <tr>
-              <td>${r.date}</td>
-              <td>${r.timeOut} — ${r.timeReturn}</td>
+              <td>${formatThaiDate(r.date)}</td>
+              <td>${r.timeOut || "-"} — ${r.timeReturn || "-"}</td>
               <td>${r.destination}</td>
               <td class="text-muted small">${r.reason}</td>
               <td>${statusBadge(r.status)}</td>
@@ -157,7 +169,7 @@ const outperm = (() => {
               <div class="card border-warning shadow-sm">
                 <div class="card-body">
                   <h6 class="fw-bold">${r.requester}</h6>
-                  <p class="mb-1 small"><i class="bi bi-calendar3 me-1"></i>${r.date} เวลา ${r.timeOut} — ${r.timeReturn}</p>
+                  <p class="mb-1 small"><i class="bi bi-calendar3 me-1"></i>${formatThaiDate(r.date)} เวลา ${r.timeOut||"-"} — ${r.timeReturn||"-"}</p>
                   <p class="mb-1 small"><i class="bi bi-geo-alt me-1"></i>${r.destination}</p>
                   <p class="mb-2 text-muted small">${r.reason}</p>
                   <div class="d-flex gap-2">
@@ -184,7 +196,7 @@ const outperm = (() => {
           <tbody>${done.map(r => `
             <tr>
               <td>${r.requester}</td>
-              <td>${r.date}</td>
+              <td>${formatThaiDate(r.date)}</td>
               <td>${r.destination}</td>
               <td>${statusBadge(r.status)}</td>
             </tr>
