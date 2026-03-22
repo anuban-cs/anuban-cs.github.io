@@ -887,12 +887,9 @@ function submitOutPermission(form) {
 
   // แจ้ง Admin ด้วย (text)
   notifyRole('Admin',
-    '🚗 '+user.name+' ขออนุญาตออกนอกโรงเรียน
-'
-    +'📅 '+form.date+' เวลา '+timeStr+'
-'
-    +'📍 '+form.destination+'
-'
+    '🚗 '+user.name+' ขออนุญาตออกนอกโรงเรียน\n'
+    +'📅 '+form.date+' เวลา '+timeStr+'\n'
+    +'📍 '+form.destination+'\n'
     +'เหตุผล: '+form.reason);
 
   return {status:'success', message:'บันทึกคำขอเรียบร้อยแล้ว'};
@@ -908,10 +905,8 @@ function approveOutPermission(outId, approverId) {
     var user = getUserInfo(rows[i][1]);
     var lid  = getLineId(rows[i][1]);
     if (lid) lineText(lid,
-      '✅ คำขอออกนอกโรงเรียนของคุณได้รับการอนุมัติแล้ว
-'
-      +'📅 '+rows[i][2]+' เวลา '+rows[i][3]+' — '+rows[i][4]+'
-'
+      '✅ คำขอออกนอกโรงเรียนของคุณได้รับการอนุมัติแล้ว\n'
+      +'📅 '+rows[i][2]+' เวลา '+rows[i][3]+' — '+rows[i][4]+'\n'
       +'📍 '+rows[i][5]);
     return {status:'success', message:'อนุมัติเรียบร้อย'};
   }
@@ -927,10 +922,8 @@ function rejectOutPermission(outId, approverId, reason) {
     sh.getRange(i+1,11).setValue(approverId);
     var lid = getLineId(rows[i][1]);
     if (lid) lineText(lid,
-      '❌ คำขอออกนอกโรงเรียนไม่ได้รับการอนุมัติ
-'
-      +'📅 '+rows[i][2]+'
-'
+      '❌ คำขอออกนอกโรงเรียนไม่ได้รับการอนุมัติ\n'
+      +'📅 '+rows[i][2]+'\n'
       +'เหตุผล: '+reason);
     return {status:'success', message:'ไม่อนุมัติเรียบร้อย'};
   }

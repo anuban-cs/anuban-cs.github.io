@@ -135,7 +135,8 @@ const router = (() => {
     'login-section', 'dashboard-section',
     'deputy-list-section', 'director-list-section',
     'teacher-task-section', 'tracking-section',
-    'leave-section', 'approve-leave-section', 'stats-section'
+    'leave-section', 'approve-leave-section', 'stats-section',
+    'outperm-section'
   ];
 
   function showOnly(sectionId) {
