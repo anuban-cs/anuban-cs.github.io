@@ -37,7 +37,8 @@ const app = (() => {
         { title: 'อนุมัติใบลา',           sub: 'รายการใบลาคงค้าง',           color: 'primary', icon: 'bi-person-check-fill',    fn: "leaves.loadLeaveApprovals('Director')" },
         { title: 'สถิติการลา',            sub: 'ดูภาพรวมวันลาทั้งโรงเรียน', color: 'dark',    icon: 'bi-graph-up',             fn: 'leaves.openStatsSystem()' },
         { title: 'อนุมัติออกนอกโรงเรียน', sub: 'รายการขออนุญาตคงค้าง',      color: 'warning', icon: 'bi-door-open-fill',       fn: 'outperm.loadApprovals()' },
-        { title: 'ตั้งค่ารักษาการ ผอ.',   sub: 'กำหนดผู้รักษาการแต่ละวัน',  color: 'secondary',icon: 'bi-person-badge-fill',   fn: 'acting.openModal()' }
+        { title: 'ตั้งค่ารักษาการ ผอ.',   sub: 'กำหนดผู้รักษาการแต่ละวัน',  color: 'secondary',icon: 'bi-person-badge-fill',   fn: 'acting.openModal()' },
+        { title: 'งานวิจัยในชั้นเรียน',   sub: 'ดูและจัดการงานวิจัยทั้งหมด', color: 'info',   icon: 'bi-journal-bookmark-fill', fn: "window.open('research.html','_blank')" }
       ],
       AcademicHead: [
         { title: 'รายการการลา',   sub: 'ดูการลาเพื่อจัดตารางสอนแทน', color: 'primary', icon: 'bi-calendar2-week-fill', fn: 'outperm.loadLeaveStats()' },
@@ -53,7 +54,8 @@ const app = (() => {
     const commonMenus = [
       { title: 'ระบบการลา',              sub: 'ขอลาป่วย/ลากิจ/ตรวจสอบสถิติ', color: 'success', icon: 'bi-calendar2-check-fill', fn: 'leaves.openLeaveSystem()' },
       { title: 'งานที่ได้รับมอบหมาย',    sub: 'ตรวจสอบและรายงานผล',           color: 'primary', icon: 'bi-person-workspace',     fn: 'docs.loadMyTasks()' },
-      { title: 'ขออนุญาตออกนอกโรงเรียน', sub: 'บันทึกคำขอออกนอกสถานที่',     color: 'info',    icon: 'bi-door-open-fill',       fn: 'outperm.openSubmitModal()' }
+      { title: 'ขออนุญาตออกนอกโรงเรียน', sub: 'บันทึกคำขอออกนอกสถานที่',     color: 'info',    icon: 'bi-door-open-fill',       fn: 'outperm.openSubmitModal()' },
+      { title: 'ส่งงานวิจัยในชั้นเรียน', sub: 'อัปโหลดและติดตามงานวิจัย',    color: 'warning', icon: 'bi-journal-bookmark-fill', fn: "window.open('research.html','_blank')" }
     ];
 
     // Teacher ใช้ commonMenus เท่านั้น, Role อื่นๆ ใช้ roleMenus + commonMenus (ไม่ซ้ำ)

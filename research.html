@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>งานวิจัยในชั้นเรียน | โรงเรียนอนุบาลชุมแสง</title>
+  <link rel="icon" href="favicon.ico">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="config.js"></script>
+
+<style>
+:root {
+  --sky:      #bae6fd;
+  --sky-dark: #38bdf8;
+  --sky-deep: #0284c7;
+  --yellow:   #fef08a;
+  --yellow-dark: #facc15;
+  --white:    #ffffff;
+  --gray-50:  #f8fafc;
+  --gray-100: #f0f9ff;
+  --gray-200: #e0f2fe;
+  --text:     #0f172a;
+  --text-muted: #64748b;
+  --card-shadow: 0 4px 24px rgba(2,132,199,0.10);
+  --radius: 18px;
+}
+
+* { font-family: 'Sarabun', sans-serif; }
+h1,h2,h3,h4,h5,h6,.heading { font-family: 'Kanit', sans-serif; }
+
+body {
+  background: linear-gradient(135deg, #e0f2fe 0%, #fef9c3 50%, #e0f2fe 100%);
+  min-height: 100vh;
+  color: var(--text);
+}
+
+/* ── Header ── */
+.page-header {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 60%, #1e40af 100%);
+  padding: 28px 0 20px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 24px rgba(2,132,199,0.25);
+}
+.page-header .school-logo {
+  width: 56px; height: 56px; border-radius: 50%;
+  object-fit: cover; border: 3px solid rgba(255,255,255,0.5);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.page-header h1 {
+  font-size: 1.4rem; color: #fff; font-weight: 600; margin: 0;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.page-header p { color: rgba(255,255,255,0.8); font-size: 0.85rem; margin: 2px 0 0; }
+.back-btn {
+  color: rgba(255,255,255,0.85); text-decoration: none;
+  font-size: 0.85rem; transition: color .2s;
+}
+.back-btn:hover { color: #fff; }
+
+/* ── Tabs ── */
+.tab-nav {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(12px);
+  border-radius: 50px;
+  padding: 5px;
+  display: inline-flex;
+  gap: 4px;
+  box-shadow: 0 2px 16px rgba(2,132,199,0.12);
+  margin-bottom: 28px;
+}
+.tab-btn {
+  padding: 8px 22px; border-radius: 50px; border: none;
+  background: transparent; font-size: 0.92rem; font-weight: 500;
+  color: var(--text-muted); cursor: pointer; transition: all .25s;
+  font-family: 'Sarabun', sans-serif;
+}
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--sky-deep), #1d4ed8);
+  color: #fff; box-shadow: 0 3px 12px rgba(2,132,199,0.35);
+}
+.tab-btn:hover:not(.active) { background: var(--gray-200); color: var(--sky-deep); }
+
+/* ── Card ── */
+.research-card {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  border: 1.5px solid rgba(186,230,253,0.6);
+  transition: box-shadow .25s, transform .25s;
+}
+.research-card:hover { box-shadow: 0 8px 32px rgba(2,132,199,0.16); }
+
+/* ── Form ── */
+.form-section-title {
+  font-family: 'Kanit', sans-serif;
+  font-size: 0.8rem; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--sky-deep);
+  margin-bottom: 12px; padding-bottom: 6px;
+  border-bottom: 2px solid var(--sky);
+}
+.form-control, .form-select {
+  border: 1.5px solid #bae6fd; border-radius: 10px;
+  background: #f0f9ff; font-size: 0.93rem; color: var(--text);
+  transition: border-color .2s, box-shadow .2s;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--sky-deep);
+  box-shadow: 0 0 0 3px rgba(2,132,199,0.12);
+  background: #fff;
+}
+.form-label { font-weight: 500; font-size: 0.9rem; color: #1e40af; margin-bottom: 4px; }
+.required-star { color: #ef4444; }
+
+/* ── File Upload ── */
+.file-drop-zone {
+  border: 2.5px dashed #7dd3fc; border-radius: 14px;
+  background: linear-gradient(135deg, #f0f9ff, #fefce8);
+  padding: 28px; text-align: center; cursor: pointer;
+  transition: all .25s;
+}
+.file-drop-zone:hover, .file-drop-zone.dragover {
+  border-color: var(--sky-deep);
+  background: linear-gradient(135deg, #e0f2fe, #fef9c3);
+  transform: translateY(-2px);
+}
+.file-drop-zone .upload-icon { font-size: 2.2rem; color: #7dd3fc; margin-bottom: 8px; }
+.file-preview {
+  background: #f0fdf4; border: 1.5px solid #86efac;
+  border-radius: 10px; padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 10px;
+}
+.file-preview .file-icon { font-size: 1.5rem; }
+
+/* ── Btn ── */
+.btn-submit {
+  background: linear-gradient(135deg, #0284c7, #1d4ed8);
+  color: #fff; border: none; border-radius: 50px;
+  padding: 12px 36px; font-size: 1rem; font-weight: 600;
+  letter-spacing: .02em; transition: all .25s;
+  box-shadow: 0 4px 16px rgba(2,132,199,0.3);
+  font-family: 'Kanit', sans-serif;
+}
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(2,132,199,0.4);
+  color: #fff;
+}
+.btn-submit:active { transform: translateY(0); }
+.btn-submit:disabled { opacity: .65; transform: none; }
+
+.btn-yellow {
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  color: #1a1a1a; border: none; border-radius: 50px;
+  padding: 10px 28px; font-weight: 600; transition: all .25s;
+}
+.btn-yellow:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(250,204,21,0.4); }
+
+/* ── Progress ── */
+.upload-progress { display: none; }
+.progress { height: 8px; border-radius: 50px; background: #e0f2fe; }
+.progress-bar { background: linear-gradient(90deg, #38bdf8, #0284c7); border-radius: 50px; }
+
+/* ── Table ── */
+.research-table { border-radius: 14px; overflow: hidden; }
+.research-table thead th {
+  background: linear-gradient(135deg, #0284c7, #1d4ed8);
+  color: #fff; font-family: 'Kanit', sans-serif;
+  font-weight: 500; font-size: 0.88rem; border: none;
+  white-space: nowrap; padding: 12px 14px;
+}
+.research-table tbody tr { transition: background .15s; }
+.research-table tbody tr:hover { background: #f0f9ff; }
+.research-table td { vertical-align: middle; font-size: 0.88rem; border-color: #e0f2fe; }
+
+/* ── Type Badge ── */
+.type-badge {
+  font-size: 0.78rem; padding: 3px 10px; border-radius: 50px;
+  font-weight: 600; white-space: nowrap;
+}
+.type-ปฏิบัติ  { background:#dbeafe; color:#1d4ed8; }
+.type-ทฤษฎี   { background:#fef3c7; color:#92400e; }
+.type-โครงงาน { background:#d1fae5; color:#065f46; }
+.type-STEM     { background:#ede9fe; color:#5b21b6; }
+.type-ปัญหาเป็นฐาน { background:#fce7f3; color:#9d174d; }
+.type-อื่นๆ   { background:#f1f5f9; color:#475569; }
+
+/* ── Filter Bar ── */
+.filter-bar {
+  background: rgba(255,255,255,0.8); backdrop-filter: blur(8px);
+  border-radius: 14px; padding: 16px 20px;
+  border: 1.5px solid rgba(186,230,253,0.5);
+  box-shadow: 0 2px 12px rgba(2,132,199,0.08);
+}
+
+/* ── Stats ── */
+.stat-card {
+  background: rgba(255,255,255,0.85); border-radius: 14px;
+  padding: 18px 20px; text-align: center;
+  border: 1.5px solid rgba(186,230,253,0.5);
+  box-shadow: 0 2px 12px rgba(2,132,199,0.08);
+  transition: transform .2s;
+}
+.stat-card:hover { transform: translateY(-3px); }
+.stat-card .stat-num {
+  font-family: 'Kanit', sans-serif;
+  font-size: 2.2rem; font-weight: 700;
+  background: linear-gradient(135deg, #0284c7, #1d4ed8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.stat-card .stat-label { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+
+/* ── No data ── */
+.no-data {
+  text-align: center; padding: 60px 20px;
+  color: var(--text-muted);
+}
+.no-data i { font-size: 3rem; color: #bae6fd; margin-bottom: 12px; display: block; }
+
+/* ── Loading ── */
+.overlay-loading {
+  display: none; position: fixed; inset: 0;
+  background: rgba(2,132,199,0.12); backdrop-filter: blur(4px);
+  z-index: 9999; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+}
+.spinner-ring {
+  width: 56px; height: 56px;
+  border: 5px solid rgba(2,132,199,0.2);
+  border-top-color: var(--sky-deep);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .tab-btn { padding: 7px 14px; font-size: 0.82rem; }
+  .page-header h1 { font-size: 1.1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div class="overlay-loading" id="overlay">
+  <div class="spinner-ring"></div>
+  <p style="color:#0284c7;font-weight:600;font-family:'Kanit',sans-serif"
+     id="overlay-text">กำลังอัปโหลดไฟล์...</p>
+</div>
+
+<!-- Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-3">
+        <img src="logoAbCs.jpg" class="school-logo" alt="logo">
+        <div>
+          <h1><i class="bi bi-journal-bookmark-fill me-2"></i>งานวิจัยในชั้นเรียน</h1>
+          <p>โรงเรียนอนุบาลชุมแสง (วัดทับกฤชกลาง)</p>
+        </div>
+      </div>
+      <a href="index.html" class="back-btn d-none d-md-flex align-items-center gap-1">
+        <i class="bi bi-arrow-left-circle"></i> กลับสู่ระบบหลัก
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+
+  <!-- Tab Navigation -->
+  <div class="d-flex justify-content-center">
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('submit')">
+        <i class="bi bi-cloud-upload-fill me-1"></i>ส่งงานวิจัย
+      </button>
+      <button class="tab-btn" onclick="switchTab('list')" id="tab-list-btn">
+        <i class="bi bi-table me-1"></i>รายการทั้งหมด
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- TAB 1: ส่งงานวิจัย                                -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div id="tab-submit">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="research-card p-4 p-md-5">
+
+          <div class="text-center mb-4">
+            <div style="width:56px;height:56px;background:linear-gradient(135deg,#bae6fd,#7dd3fc);
+              border-radius:16px;display:inline-flex;align-items:center;justify-content:center;
+              font-size:1.6rem;margin-bottom:10px">📚</div>
+            <h4 class="heading fw-bold text-primary mb-1">แบบฟอร์มส่งงานวิจัยในชั้นเรียน</h4>
+            <p class="text-muted small">กรุณากรอกข้อมูลให้ครบถ้วนก่อนส่ง</p>
+          </div>
+
+          <form id="researchForm" novalidate>
+
+            <!-- ส่วนที่ 1: ข้อมูลครู -->
+            <p class="form-section-title"><i class="bi bi-person-fill me-1"></i>ข้อมูลครูผู้สอน</p>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label">ชื่อ-นามสกุล ครูผู้สอน <span class="required-star">*</span></label>
+                <input type="text" class="form-control" id="f-teacher" placeholder="ชื่อ-นามสกุล" required>
+                <div class="invalid-feedback">กรุณาระบุชื่อครูผู้สอน</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">รายวิชา <span class="required-star">*</span></label>
+                <input type="text" class="form-control" id="f-subject" placeholder="เช่น คณิตศาสตร์, ภาษาไทย" required>
+                <div class="invalid-feedback">กรุณาระบุรายวิชา</div>
+              </div>
+            </div>
+
+            <!-- ส่วนที่ 2: ข้อมูลงานวิจัย -->
+            <p class="form-section-title"><i class="bi bi-lightbulb-fill me-1"></i>ข้อมูลงานวิจัย</p>
+            <div class="row g-3 mb-4">
+              <div class="col-12">
+                <label class="form-label">ชื่อหัวข้องานวิจัย <span class="required-star">*</span></label>
+                <input type="text" class="form-control" id="f-title"
+                  placeholder="ระบุหัวข้องานวิจัยในชั้นเรียน" required>
+                <div class="invalid-feedback">กรุณาระบุหัวข้องานวิจัย</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">ประเภทงานวิจัย <span class="required-star">*</span></label>
+                <select class="form-select" id="f-type" required>
+                  <option value="">-- เลือกประเภท --</option>
+                  <option value="ปฏิบัติ">🔬 วิจัยเชิงปฏิบัติ (Action Research)</option>
+                  <option value="ทฤษฎี">📖 วิจัยเชิงทฤษฎี</option>
+                  <option value="โครงงาน">🏗️ โครงงาน (Project-Based)</option>
+                  <option value="STEM">⚗️ STEM Education</option>
+                  <option value="ปัญหาเป็นฐาน">🔍 ปัญหาเป็นฐาน (PBL)</option>
+                  <option value="อื่นๆ">📌 อื่นๆ</option>
+                </select>
+                <div class="invalid-feedback">กรุณาเลือกประเภทงานวิจัย</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">วันที่ส่งงาน <span class="required-star">*</span></label>
+                <input type="date" class="form-control" id="f-date" required>
+                <div class="invalid-feedback">กรุณาระบุวันที่</div>
+              </div>
+            </div>
+
+            <!-- ส่วนที่ 3: ไฟล์แนบ -->
+            <p class="form-section-title"><i class="bi bi-paperclip me-1"></i>ไฟล์แนบ</p>
+            <div class="mb-4">
+              <div class="file-drop-zone" id="dropZone" onclick="document.getElementById('f-file').click()">
+                <div class="upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                <p class="fw-600 mb-1" style="color:#0284c7;font-weight:600">คลิกหรือลากไฟล์มาวางที่นี่</p>
+                <p class="text-muted small mb-0">รองรับ PDF, Word (.docx), รูปภาพ (JPG, PNG) ขนาดไม่เกิน 20MB</p>
+              </div>
+              <input type="file" id="f-file" class="d-none"
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.ppt,.pptx">
+              <div id="file-preview-area"></div>
+
+              <!-- Upload Progress -->
+              <div class="upload-progress mt-3" id="uploadProgress">
+                <div class="d-flex justify-content-between mb-1">
+                  <small style="color:#0284c7;font-weight:600">กำลังอัปโหลดไฟล์...</small>
+                  <small id="progress-pct" style="color:#0284c7">0%</small>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar" id="progressBar" style="width:0%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ส่วนที่ 4: หมายเหตุ -->
+            <p class="form-section-title"><i class="bi bi-chat-text-fill me-1"></i>หมายเหตุเพิ่มเติม</p>
+            <div class="mb-4">
+              <textarea class="form-control" id="f-note" rows="3"
+                placeholder="หมายเหตุ เพิ่มเติม หรือรายละเอียดอื่นๆ (ถ้ามี)"></textarea>
+            </div>
+
+            <!-- Submit -->
+            <div class="text-center">
+              <button type="submit" class="btn btn-submit" id="btnSubmit">
+                <i class="bi bi-send-fill me-2"></i>ส่งงานวิจัย
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- TAB 2: รายการทั้งหมด                              -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div id="tab-list" class="d-none">
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4" id="stats-row">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label"><i class="bi bi-files me-1"></i>งานวิจัยทั้งหมด</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-teachers">0</div>
+          <div class="stat-label"><i class="bi bi-people me-1"></i>ครูที่ส่งงาน</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-subjects">0</div>
+          <div class="stat-label"><i class="bi bi-book me-1"></i>รายวิชา</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-month">0</div>
+          <div class="stat-label"><i class="bi bi-calendar3 me-1"></i>เดือนนี้</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar mb-4">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-primary mb-1">
+            <i class="bi bi-search me-1"></i>ค้นหา
+          </label>
+          <input type="text" class="form-control form-control-sm" id="filter-q"
+            placeholder="ชื่อครู / หัวข้อ / วิชา..." oninput="renderTable()">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-primary mb-1">ครูผู้สอน</label>
+          <select class="form-select form-select-sm" id="filter-teacher" onchange="renderTable()">
+            <option value="">ทั้งหมด</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-primary mb-1">รายวิชา</label>
+          <select class="form-select form-select-sm" id="filter-subject" onchange="renderTable()">
+            <option value="">ทั้งหมด</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-primary mb-1">ประเภทงานวิจัย</label>
+          <select class="form-select form-select-sm" id="filter-type" onchange="renderTable()">
+            <option value="">ทั้งหมด</option>
+            <option value="ปฏิบัติ">เชิงปฏิบัติ</option>
+            <option value="ทฤษฎี">เชิงทฤษฎี</option>
+            <option value="โครงงาน">โครงงาน</option>
+            <option value="STEM">STEM</option>
+            <option value="ปัญหาเป็นฐาน">ปัญหาเป็นฐาน</option>
+            <option value="อื่นๆ">อื่นๆ</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="research-card p-3">
+      <div class="d-flex justify-content-between align-items-center mb-3 px-1">
+        <span class="fw-bold" style="font-family:'Kanit',sans-serif;color:#0284c7">
+          <i class="bi bi-table me-1"></i>รายการงานวิจัย
+          <span class="badge ms-2" style="background:#bae6fd;color:#0284c7;font-size:.8rem"
+            id="result-count">0 รายการ</span>
+        </span>
+        <button class="btn btn-sm" style="background:#f0f9ff;color:#0284c7;border:1.5px solid #bae6fd;"
+          onclick="loadResearchList()">
+          <i class="bi bi-arrow-clockwise me-1"></i>รีเฟรช
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table research-table table-hover mb-0" id="researchTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>ครูผู้สอน</th>
+              <th>รายวิชา</th>
+              <th>หัวข้องานวิจัย</th>
+              <th>ประเภท</th>
+              <th>วันที่ส่ง</th>
+              <th>ไฟล์</th>
+              <th>หมายเหตุ</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="9" class="text-center text-muted py-5">
+              <div class="no-data">
+                <i class="bi bi-hourglass-split"></i>
+                กำลังโหลดข้อมูล...
+              </div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="border-radius:18px;border:1.5px solid #bae6fd">
+      <div class="modal-header" style="background:linear-gradient(135deg,#0284c7,#1d4ed8);border-radius:16px 16px 0 0">
+        <h5 class="modal-title text-white" style="font-family:'Kanit',sans-serif">
+          <i class="bi bi-pencil-fill me-2"></i>แก้ไขงานวิจัย
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="edit-id">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">ชื่อครูผู้สอน</label>
+            <input type="text" class="form-control" id="edit-teacher">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">รายวิชา</label>
+            <input type="text" class="form-control" id="edit-subject">
+          </div>
+          <div class="col-12">
+            <label class="form-label">ชื่อหัวข้องานวิจัย</label>
+            <input type="text" class="form-control" id="edit-title">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">ประเภทงานวิจัย</label>
+            <select class="form-select" id="edit-type">
+              <option value="ปฏิบัติ">เชิงปฏิบัติ</option>
+              <option value="ทฤษฎี">เชิงทฤษฎี</option>
+              <option value="โครงงาน">โครงงาน</option>
+              <option value="STEM">STEM</option>
+              <option value="ปัญหาเป็นฐาน">ปัญหาเป็นฐาน</option>
+              <option value="อื่นๆ">อื่นๆ</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">วันที่ส่ง</label>
+            <input type="date" class="form-control" id="edit-date">
+          </div>
+          <div class="col-12">
+            <label class="form-label">หมายเหตุ</label>
+            <textarea class="form-control" id="edit-note" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-submit" onclick="saveEdit()">
+          <i class="bi bi-save-fill me-1"></i>บันทึก
+        </button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ── State ──────────────────────────────────────────────────
+let allResearch = [];
+let currentUser = null;
+
+// ── Init ───────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Set default date to today
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+
+  // Load user from session
+  try {
+    const raw = localStorage.getItem(APP_CONFIG.SESSION_KEY);
+    if (raw) {
+      const s = JSON.parse(raw);
+      currentUser = s.user;
+      if (currentUser?.name) {
+        document.getElementById('f-teacher').value = currentUser.name;
+      }
+    }
+  } catch(e) {}
+
+  setupFileUpload();
+  document.getElementById('researchForm').addEventListener('submit', submitResearch);
+});
+
+// ── Tab Switch ─────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (i === 0) === (tab === 'submit'));
+  });
+  document.getElementById('tab-submit').classList.toggle('d-none', tab !== 'submit');
+  document.getElementById('tab-list').classList.toggle('d-none', tab !== 'list');
+  if (tab === 'list') loadResearchList();
+}
+
+// ── API Call ───────────────────────────────────────────────
+async function apiCall(action, params={}) {
+  const session = (() => {
+    try { return JSON.parse(localStorage.getItem(APP_CONFIG.SESSION_KEY)); } catch{return null;}
+  })();
+  const body = { action, ...params,
+    ...(session && action !== 'checkLogin'
+      ? { sessionToken: session.sessionToken || session.token, userId: session.user?.id }
+      : {}) };
+  const r = await fetch(APP_CONFIG.GAS_URL, {
+    method:'POST', headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify(body)
+  });
+  return r.json();
+}
+
+// ── File Upload Setup ──────────────────────────────────────
+function setupFileUpload() {
+  const drop = document.getElementById('dropZone');
+  const input = document.getElementById('f-file');
+
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) {
+      input.files = e.dataTransfer.files;
+      showFilePreview(e.dataTransfer.files[0]);
+    }
+  });
+  input.addEventListener('change', () => {
+    if (input.files[0]) showFilePreview(input.files[0]);
+  });
+}
+
+function showFilePreview(file) {
+  const icons = { pdf:'bi-file-pdf-fill', doc:'bi-file-word-fill',
+    docx:'bi-file-word-fill', jpg:'bi-file-image-fill',
+    jpeg:'bi-file-image-fill', png:'bi-file-image-fill' };
+  const ext = file.name.split('.').pop().toLowerCase();
+  const icon = icons[ext] || 'bi-file-earmark-fill';
+  const size = (file.size/1024/1024).toFixed(2);
+  document.getElementById('file-preview-area').innerHTML = `
+    <div class="file-preview">
+      <i class="bi ${icon} file-icon text-primary"></i>
+      <div class="flex-grow-1">
+        <div class="fw-bold small">${file.name}</div>
+        <div class="text-muted" style="font-size:.78rem">${size} MB</div>
+      </div>
+      <button class="btn btn-sm btn-outline-danger" onclick="clearFile()">
+        <i class="bi bi-x-circle"></i>
+      </button>
+    </div>`;
+}
+
+function clearFile() {
+  document.getElementById('f-file').value = '';
+  document.getElementById('file-preview-area').innerHTML = '';
+}
+
+// ── Submit Form ────────────────────────────────────────────
+async function submitResearch(e) {
+  e.preventDefault();
+  const form = e.target;
+
+  // Validate
+  form.classList.add('was-validated');
+  if (!form.checkValidity()) {
+    Swal.fire({ icon:'warning', title:'กรุณากรอกข้อมูลให้ครบ',
+      text:'โปรดตรวจสอบช่องที่มีเครื่องหมาย *',
+      confirmButtonColor:'#0284c7', borderRadius:'18px' });
+    return;
+  }
+
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>กำลังส่ง...';
+
+  showOverlay('กำลังอัปโหลดไฟล์...');
+
+  try {
+    // Read file
+    let fileDataArray = [];
+    const fileInput = document.getElementById('f-file');
+    if (fileInput.files[0]) {
+      animateProgress();
+      const f = fileInput.files[0];
+      const b64 = await new Promise((res,rej) => {
+        const r = new FileReader();
+        r.onload = e => res(e.target.result.split(',')[1]);
+        r.onerror = rej;
+        r.readAsDataURL(f);
+      });
+      fileDataArray = [{ name:f.name, type:f.type, content:b64 }];
+    }
+
+    const formData = {
+      userId:      currentUser?.id || '',
+      teacherName: document.getElementById('f-teacher').value.trim(),
+      subject:     document.getElementById('f-subject').value.trim(),
+      title:       document.getElementById('f-title').value.trim(),
+      type:        document.getElementById('f-type').value,
+      submitDate:  document.getElementById('f-date').value,
+      note:        document.getElementById('f-note').value.trim()
+    };
+
+    hideOverlay();
+    showOverlay('กำลังบันทึกข้อมูล...');
+
+    const res = await apiCall('submitResearch', { form: formData, fileDataArray });
+
+    hideOverlay();
+
+    if (res.status === 'success') {
+      Swal.fire({
+        icon: 'success',
+        title: '✅ ส่งงานวิจัยสำเร็จ!',
+        html: `<p class="mb-1">รหัสงาน: <b style="color:#0284c7">${res.id}</b></p>
+               <p class="text-muted small">บันทึกข้อมูลลง Google Sheet เรียบร้อยแล้ว</p>`,
+        confirmButtonColor: '#0284c7',
+        confirmButtonText: 'ตกลง'
+      });
+      form.reset();
+      form.classList.remove('was-validated');
+      document.getElementById('file-preview-area').innerHTML = '';
+      document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+      if (currentUser?.name) document.getElementById('f-teacher').value = currentUser.name;
+      document.getElementById('uploadProgress').style.display = 'none';
+    } else {
+      Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:res.message, confirmButtonColor:'#0284c7' });
+    }
+  } catch(err) {
+    hideOverlay();
+    Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:err.message, confirmButtonColor:'#0284c7' });
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-send-fill me-2"></i>ส่งงานวิจัย';
+}
+
+// ── Load Research List ─────────────────────────────────────
+async function loadResearchList() {
+  document.getElementById('tableBody').innerHTML = `
+    <tr><td colspan="9" class="text-center py-5">
+      <div class="spinner-border text-primary" style="width:2.5rem;height:2.5rem"></div>
+      <p class="mt-2 text-muted">กำลังโหลด...</p>
+    </td></tr>`;
+
+  const res = await apiCall('getResearchList', {});
+  if (Array.isArray(res)) {
+    allResearch = res;
+    buildFilters();
+    updateStats();
+    renderTable();
+  } else {
+    Swal.fire({ icon:'error', title:'โหลดข้อมูลไม่สำเร็จ', confirmButtonColor:'#0284c7' });
+  }
+}
+
+// ── Render Table ───────────────────────────────────────────
+function renderTable() {
+  const q    = document.getElementById('filter-q').value.toLowerCase();
+  const tch  = document.getElementById('filter-teacher').value;
+  const sub  = document.getElementById('filter-subject').value;
+  const typ  = document.getElementById('filter-type').value;
+
+  const filtered = allResearch.filter(r => {
+    if (q   && !`${r.teacherName}${r.title}${r.subject}`.toLowerCase().includes(q)) return false;
+    if (tch && r.teacherName !== tch) return false;
+    if (sub && r.subject    !== sub)  return false;
+    if (typ && r.type       !== typ)  return false;
+    return true;
+  });
+
+  document.getElementById('result-count').textContent = filtered.length + ' รายการ';
+
+  if (!filtered.length) {
+    document.getElementById('tableBody').innerHTML = `
+      <tr><td colspan="9">
+        <div class="no-data"><i class="bi bi-search"></i>ไม่พบข้อมูลที่ค้นหา</div>
+      </td></tr>`;
+    return;
+  }
+
+  const isAdmin = currentUser?.role === 'Director' || currentUser?.role === 'Admin';
+
+  document.getElementById('tableBody').innerHTML = filtered.map((r,i) => `
+    <tr>
+      <td><span class="badge" style="background:#e0f2fe;color:#0284c7">${i+1}</span></td>
+      <td><span class="fw-bold">${r.teacherName}</span></td>
+      <td><span class="text-muted">${r.subject}</span></td>
+      <td style="max-width:220px">
+        <div class="fw-500 text-truncate" title="${r.title}">${r.title}</div>
+      </td>
+      <td><span class="type-badge type-${r.type}">${r.type}</span></td>
+      <td class="text-muted small">${r.submitDate || '-'}</td>
+      <td>
+        ${r.fileUrl
+          ? `<a href="${r.fileUrl}" target="_blank" class="btn btn-sm"
+               style="background:#eff6ff;color:#0284c7;border:1.5px solid #bae6fd;font-size:.78rem">
+               <i class="bi bi-download me-1"></i>${r.fileName ? r.fileName.substring(0,15)+'...' : 'ดาวน์โหลด'}
+             </a>`
+          : '<span class="text-muted small">-</span>'}
+      </td>
+      <td style="max-width:140px">
+        <span class="text-muted small text-truncate d-block" title="${r.note}">${r.note||'-'}</span>
+      </td>
+      <td>
+        <div class="d-flex gap-1">
+          ${(isAdmin || r.userId === currentUser?.id) ? `
+            <button class="btn btn-sm" style="background:#fef9c3;color:#92400e;border:1.5px solid #fde68a"
+              onclick="openEdit('${r.id}')">
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+            <button class="btn btn-sm" style="background:#fef2f2;color:#dc2626;border:1.5px solid #fca5a5"
+              onclick="deleteResearch('${r.id}')">
+              <i class="bi bi-trash-fill"></i>
+            </button>` : `<span class="text-muted small">-</span>`}
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+// ── Stats ──────────────────────────────────────────────────
+function updateStats() {
+  const thisMonth = new Date().toISOString().slice(0,7);
+  document.getElementById('stat-total').textContent    = allResearch.length;
+  document.getElementById('stat-teachers').textContent = new Set(allResearch.map(r=>r.teacherName)).size;
+  document.getElementById('stat-subjects').textContent = new Set(allResearch.map(r=>r.subject)).size;
+  document.getElementById('stat-month').textContent    = allResearch.filter(r=>
+    (r.submitDate||'').startsWith(thisMonth) || (r.createdAt||'').includes('/')).length;
+}
+
+// ── Build Filters ──────────────────────────────────────────
+function buildFilters() {
+  const teachers = [...new Set(allResearch.map(r=>r.teacherName))].sort();
+  const subjects = [...new Set(allResearch.map(r=>r.subject))].sort();
+  const tSel = document.getElementById('filter-teacher');
+  const sSel = document.getElementById('filter-subject');
+  tSel.innerHTML = '<option value="">ทั้งหมด</option>' +
+    teachers.map(t=>`<option value="${t}">${t}</option>`).join('');
+  sSel.innerHTML = '<option value="">ทั้งหมด</option>' +
+    subjects.map(s=>`<option value="${s}">${s}</option>`).join('');
+}
+
+// ── Edit ───────────────────────────────────────────────────
+function openEdit(id) {
+  const r = allResearch.find(x=>x.id===id);
+  if (!r) return;
+  document.getElementById('edit-id').value      = id;
+  document.getElementById('edit-teacher').value = r.teacherName;
+  document.getElementById('edit-subject').value = r.subject;
+  document.getElementById('edit-title').value   = r.title;
+  document.getElementById('edit-type').value    = r.type;
+  document.getElementById('edit-date').value    = r.submitDate;
+  document.getElementById('edit-note').value    = r.note;
+  new bootstrap.Modal(document.getElementById('editModal')).show();
+}
+
+async function saveEdit() {
+  const id = document.getElementById('edit-id').value;
+  const form = {
+    teacherName: document.getElementById('edit-teacher').value.trim(),
+    subject:     document.getElementById('edit-subject').value.trim(),
+    title:       document.getElementById('edit-title').value.trim(),
+    type:        document.getElementById('edit-type').value,
+    submitDate:  document.getElementById('edit-date').value,
+    note:        document.getElementById('edit-note').value.trim()
+  };
+  showOverlay('กำลังบันทึก...');
+  const res = await apiCall('updateResearch', { researchId: id, form });
+  hideOverlay();
+  bootstrap.Modal.getInstance(document.getElementById('editModal'))?.hide();
+  if (res.status === 'success') {
+    Swal.fire({ icon:'success', title:'แก้ไขเรียบร้อย', timer:1500, showConfirmButton:false });
+    loadResearchList();
+  } else {
+    Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:res.message, confirmButtonColor:'#0284c7' });
+  }
+}
+
+// ── Delete ─────────────────────────────────────────────────
+async function deleteResearch(id) {
+  const result = await Swal.fire({
+    icon: 'warning',
+    title: 'ยืนยันการลบ?',
+    text: 'ข้อมูลที่ลบแล้วไม่สามารถกู้คืนได้',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#94a3b8',
+    confirmButtonText: 'ลบข้อมูล',
+    cancelButtonText: 'ยกเลิก'
+  });
+  if (!result.isConfirmed) return;
+  showOverlay('กำลังลบข้อมูล...');
+  const res = await apiCall('deleteResearch', { researchId: id });
+  hideOverlay();
+  if (res.status === 'success') {
+    Swal.fire({ icon:'success', title:'ลบเรียบร้อย', timer:1500, showConfirmButton:false });
+    loadResearchList();
+  } else {
+    Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:res.message, confirmButtonColor:'#0284c7' });
+  }
+}
+
+// ── Overlay & Progress ─────────────────────────────────────
+function showOverlay(text='') {
+  document.getElementById('overlay-text').textContent = text;
+  document.getElementById('overlay').style.display = 'flex';
+}
+function hideOverlay() {
+  document.getElementById('overlay').style.display = 'none';
+}
+function animateProgress() {
+  const bar = document.getElementById('progressBar');
+  const pct = document.getElementById('progress-pct');
+  document.getElementById('uploadProgress').style.display = 'block';
+  let p = 0;
+  const iv = setInterval(() => {
+    p = Math.min(p + Math.random()*12, 90);
+    bar.style.width = p + '%';
+    pct.textContent = Math.round(p) + '%';
+  }, 200);
+  return iv;
+}
+</script>
+</body>
+</html>

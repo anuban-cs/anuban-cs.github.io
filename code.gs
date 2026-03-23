@@ -86,6 +86,11 @@ function doPost(e) {
       // ── Leave Stats (AcademicHead/PersonnelHead) ──
       case 'getLeaveStats':           res = getLeaveStats(body.role); break;
       case 'getPersonnelDashboard':   res = getPersonnelDashboard(); break;
+      // ── Research ──
+      case 'submitResearch':          res = submitResearch(body.form, body.fileDataArray); break;
+      case 'getResearchList':         res = getResearchList(body.filters); break;
+      case 'deleteResearch':          res = deleteResearch(body.researchId, body.userId); break;
+      case 'updateResearch':          res = updateResearch(body.researchId, body.form, body.userId); break;
       default: res = { status: 'error', message: 'Unknown action: ' + act };
     }
     return jsonOut(res);
@@ -1132,4 +1137,154 @@ function changePassword(userId, oldPassword, newPassword) {
     return { status: 'success', message: 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว' };
   }
   return { status: 'error', message: 'ไม่พบผู้ใช้งาน' };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RESEARCH — งานวิจัยในชั้นเรียน
+//  Sheet "Research": ResearchID | UserID | TeacherName | Subject |
+//    Title | Type | FileUrl | FileName | SubmitDate | Note |
+//    CreatedAt | Status
+// ═══════════════════════════════════════════════════════════════
+
+function submitResearch(form, fileDataArray) {
+  try {
+    var cfg  = getConfig();
+    var sh   = ssheet().getSheetByName('Research');
+    if (!sh) return {status:'error', message:'ไม่พบ Sheet Research กรุณาสร้าง Sheet ก่อน'};
+    var tz   = Session.getScriptTimeZone();
+    var user = getUserInfo(form.userId);
+    var newId = 'RES-' + Utilities.formatDate(new Date(), tz, 'yyMMddHHmmss');
+
+    // Upload ไฟล์แนบ
+    var fileUrl = '', fileName = '';
+    if (fileDataArray && fileDataArray.length > 0) {
+      var folder = DriveApp.getFolderById(cfg.DRIVE_FOLDER_ID);
+      var f = fileDataArray[0];
+      var blob = Utilities.newBlob(Utilities.base64Decode(f.content), f.type, f.name);
+      var driveFile = folder.createFile(blob);
+      driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      fileUrl  = driveFile.getUrl();
+      fileName = f.name;
+    }
+
+    var now = Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm');
+    sh.appendRow([
+      newId, form.userId, form.teacherName, form.subject,
+      form.title, form.type, fileUrl, fileName,
+      form.submitDate, form.note || '', now, 'ส่งแล้ว'
+    ]);
+
+    // แจ้ง Director
+    notifyRoleFlex('Director',
+      '📚 ' + form.teacherName + ' ส่งงานวิจัย: ' + form.title,
+      buildResearchFlex(form.teacherName, form.subject, form.title, form.type,
+        form.submitDate, cfg.SCHOOL_NAME, cfg.APP_URL + 'research.html')
+    );
+
+    return {status:'success', message:'ส่งงานวิจัยเรียบร้อยแล้ว รหัส: ' + newId, id: newId};
+  } catch(e) { return {status:'error', message:e.toString()}; }
+}
+
+function getResearchList(filters) {
+  var sh = ssheet().getSheetByName('Research');
+  if (!sh) return [];
+  var rows = sh.getDataRange().getValues();
+  filters = filters || {};
+  var out = [];
+  for (var i = rows.length-1; i >= 1; i--) {
+    if (!rows[i][0]) continue;
+    // กรอง
+    if (filters.teacher && rows[i][2].indexOf(filters.teacher) < 0) continue;
+    if (filters.subject && rows[i][3].indexOf(filters.subject) < 0) continue;
+    if (filters.type    && rows[i][5] !== filters.type) continue;
+    out.push({
+      id:          rows[i][0],
+      userId:      rows[i][1],
+      teacherName: rows[i][2],
+      subject:     rows[i][3],
+      title:       rows[i][4],
+      type:        rows[i][5],
+      fileUrl:     rows[i][6],
+      fileName:    rows[i][7],
+      submitDate:  rows[i][8],
+      note:        rows[i][9],
+      createdAt:   rows[i][10],
+      status:      rows[i][11]
+    });
+  }
+  return out;
+}
+
+function deleteResearch(researchId, userId) {
+  var sh   = ssheet().getSheetByName('Research');
+  var user = getUserInfo(userId);
+  // เฉพาะ Admin/Director ลบได้
+  if (user.role !== 'Director' && user.role !== 'Admin') {
+    var rows = sh.getDataRange().getValues();
+    for (var i=1;i<rows.length;i++) {
+      if (rows[i][0] == researchId && rows[i][1] != userId)
+        return {status:'error', message:'ไม่มีสิทธิ์ลบงานวิจัยของผู้อื่น'};
+    }
+  }
+  var rows = sh.getDataRange().getValues();
+  for (var i=1;i<rows.length;i++) {
+    if (rows[i][0] == researchId) { sh.deleteRow(i+1); break; }
+  }
+  return {status:'success', message:'ลบข้อมูลเรียบร้อยแล้ว'};
+}
+
+function updateResearch(researchId, form, userId) {
+  var sh   = ssheet().getSheetByName('Research');
+  var rows = sh.getDataRange().getValues();
+  var tz   = Session.getScriptTimeZone();
+  for (var i=1;i<rows.length;i++) {
+    if (rows[i][0] != researchId) continue;
+    if (rows[i][1] != userId) return {status:'error', message:'ไม่มีสิทธิ์แก้ไขงานของผู้อื่น'};
+    sh.getRange(i+1, 3).setValue(form.teacherName || rows[i][2]);
+    sh.getRange(i+1, 4).setValue(form.subject     || rows[i][3]);
+    sh.getRange(i+1, 5).setValue(form.title       || rows[i][4]);
+    sh.getRange(i+1, 6).setValue(form.type        || rows[i][5]);
+    sh.getRange(i+1, 9).setValue(form.submitDate  || rows[i][8]);
+    sh.getRange(i+1,10).setValue(form.note        || rows[i][9]);
+    return {status:'success', message:'แก้ไขข้อมูลเรียบร้อยแล้ว'};
+  }
+  return {status:'error', message:'ไม่พบรหัสงานวิจัย'};
+}
+
+// Flex Card แจ้ง Director เมื่อมีงานวิจัยใหม่
+function buildResearchFlex(teacher, subject, title, type, date, school, url) {
+  return {
+    type:'bubble', size:'kilo',
+    header:{
+      type:'box', layout:'vertical', paddingAll:'14px',
+      backgroundColor:'#3b82f6',
+      contents:[
+        {type:'text', text:'📚 มีงานวิจัยในชั้นเรียนใหม่', color:'#fff', size:'md', weight:'bold'},
+        {type:'text', text:school, color:'rgba(255,255,255,0.7)', size:'xs', margin:'xs'}
+      ]
+    },
+    body:{
+      type:'box', layout:'vertical', paddingAll:'16px', spacing:'md',
+      contents:[
+        {type:'box', layout:'vertical', paddingAll:'12px',
+          backgroundColor:'#eff6ff', cornerRadius:'10px', spacing:'sm',
+          contents:[
+            _row('ครูผู้สอน', teacher),
+            _row('รายวิชา',   subject),
+            _row('ประเภท',    type),
+            _row('วันที่ส่ง', date)
+          ]},
+        {type:'box', layout:'vertical', paddingAll:'10px',
+          backgroundColor:'#fefce8', cornerRadius:'8px',
+          contents:[
+            {type:'text', text:'📌 ' + title, size:'sm', color:'#1a202c', wrap:true, weight:'bold'}
+          ]}
+      ]
+    },
+    footer: url ? {
+      type:'box', layout:'vertical', paddingAll:'12px',
+      contents:[{type:'button', style:'primary', color:'#3b82f6', height:'sm',
+        action:{type:'uri', label:'📊 ดูรายงานวิจัย', uri:url}}]
+    } : undefined
+  };
 }
