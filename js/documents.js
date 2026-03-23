@@ -169,24 +169,66 @@ const docs = (() => {
     document.getElementById('dir-files-area').innerHTML     = renderFileLinks(doc.fileUrls, true);
     document.getElementById('dir-command').value = '';
 
-    // โหลด Checkbox ครู
+    // โหลด Checkbox บุคลากรทั้งหมด (ยกเว้น ผอ.)
     const container = document.getElementById('teacher-checkbox-list');
     container.innerHTML = '<span class="spinner-border spinner-border-sm"></span> กำลังโหลดรายชื่อ...';
 
     const teachers = await api.call('getTeacherList');
     container.innerHTML = '';
     if (Array.isArray(teachers) && teachers.length > 0) {
+      // จัดกลุ่มตาม Role
+      const roleLabel = {
+        Deputy:       'รองผู้อำนวยการ',
+        Admin:        'เจ้าหน้าที่ธุรการ',
+        AcademicHead: 'หัวหน้าวิชาการ',
+        PersonnelHead:'หัวหน้าบุคคล',
+        Teacher:      'ครูผู้สอน'
+      };
+      const groups = {};
       teachers.forEach(t => {
-        const div = document.createElement('div');
-        div.className = 'form-check';
-        div.innerHTML = `
-          <input class="form-check-input teacher-check" type="checkbox" value="${t.id}" id="chk-${t.id}">
-          <label class="form-check-label" for="chk-${t.id}">${t.name}</label>
-        `;
-        container.appendChild(div);
+        const g = roleLabel[t.role] || t.role || 'อื่นๆ';
+        if (!groups[g]) groups[g] = [];
+        groups[g].push(t);
+      });
+
+      // ปุ่มเลือกทั้งหมด / ยกเลิกทั้งหมด
+      const toolbar = document.createElement('div');
+      toolbar.className = 'mb-2 d-flex gap-2';
+      toolbar.innerHTML = `
+        <button type="button" class="btn btn-sm btn-outline-primary"
+          onclick="document.querySelectorAll('.teacher-check').forEach(c=>c.checked=true)">
+          เลือกทั้งหมด
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary"
+          onclick="document.querySelectorAll('.teacher-check').forEach(c=>c.checked=false)">
+          ยกเลิกทั้งหมด
+        </button>
+      `;
+      container.appendChild(toolbar);
+
+      // แสดงแต่ละกลุ่ม
+      Object.keys(groups).forEach(grp => {
+        const grpEl = document.createElement('div');
+        grpEl.className = 'mb-2';
+        grpEl.innerHTML = `<p class="fw-bold small text-muted mb-1 border-bottom pb-1">
+          <i class="bi bi-people-fill me-1"></i>${grp}
+        </p>`;
+        groups[grp].forEach(t => {
+          const div = document.createElement('div');
+          div.className = 'form-check';
+          div.innerHTML = `
+            <input class="form-check-input teacher-check" type="checkbox" value="${t.id}" id="chk-${t.id}">
+            <label class="form-check-label" for="chk-${t.id}">
+              ${t.name}
+              ${t.position ? `<small class="text-muted ms-1">(${t.position})</small>` : ''}
+            </label>
+          `;
+          grpEl.appendChild(div);
+        });
+        container.appendChild(grpEl);
       });
     } else {
-      container.innerHTML = '<small class="text-muted">ไม่พบรายชื่อครู</small>';
+      container.innerHTML = '<small class="text-muted">ไม่พบรายชื่อบุคลากร</small>';
     }
 
     new bootstrap.Modal(document.getElementById('modalDirectorCommand')).show();

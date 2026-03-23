@@ -396,8 +396,13 @@ function submitDeputyReview(docId, comment, userId) {
 }
 
 function getTeacherList() {
+  // แสดงบุคลากรทุกคน ยกเว้น Director
   var rows=ssheet().getSheetByName('Users').getDataRange().getValues(), out=[];
-  for (var i=1;i<rows.length;i++) if (rows[i][4]==='Teacher') out.push({id:rows[i][0],name:rows[i][3]});
+  for (var i=1;i<rows.length;i++) {
+    if (rows[i][4]==='Director') continue; // ยกเว้น ผอ.
+    if (!rows[i][0] || !rows[i][3]) continue; // ข้ามแถวว่าง
+    out.push({id:rows[i][0], name:rows[i][3], role:rows[i][4], position:rows[i][5]});
+  }
   return out;
 }
 
@@ -882,18 +887,25 @@ function submitOutPermission(form) {
   ]);
 
   // Flex Card แจ้งผู้อำนวยการ หรือ รักษาการ
-  var timeStr = form.timeOut + ' — ' + form.timeReturn;
-  var bubble  = buildOutPermissionFlex(
-    user.name, form.date, timeStr,
+  var timeStr    = form.timeOut + ' — ' + form.timeReturn;
+  var dateDisp   = dateDisplay || form.date;
+  var bubble     = buildOutPermissionFlex(
+    user.name, dateDisp, timeStr,
     form.destination, form.reason, cfg.SCHOOL_NAME, cfg.APP_URL
   );
   var alt = '🚗 '+user.name+' ขออนุญาตออกนอกโรงเรียน';
-  notifyActingOrDirector(alt, bubble, null);
 
-  // แจ้ง Admin ด้วย (text)
+  // 1. แจ้งรักษาการ (ถ้ามี)
+  var actId = getActingDirectorId();
+  if (actId) lineFlex(actId, alt, bubble);
+
+  // 2. แจ้ง Director ทุกคนเสมอ (ไม่ว่าจะมีรักษาการหรือไม่)
+  notifyRoleFlex('Director', alt, bubble);
+
+  // 3. แจ้ง Admin (text)
   notifyRole('Admin',
     '🚗 '+user.name+' ขออนุญาตออกนอกโรงเรียน\n'
-    +'📅 '+form.date+' เวลา '+timeStr+'\n'
+    +'📅 '+dateDisp+' เวลา '+timeStr+'\n'
     +'📍 '+form.destination+'\n'
     +'เหตุผล: '+form.reason);
 
