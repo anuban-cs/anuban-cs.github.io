@@ -1,7 +1,7 @@
 // ============================================================
 // js/outperm.js — Out Permission + Acting Director + Leave Stats
 // ============================================================
-
+//
 // แปลงวันที่เป็นรูปแบบไทย
 function formatThaiDate(dateStr) {
   if (!dateStr) return '-';
