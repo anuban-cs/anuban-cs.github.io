@@ -71,6 +71,10 @@ function doPost(e) {
       case 'getMyLeaves':             res = getMyLeaves(body.userId); break;
       case 'requestCancelLeave':      res = requestCancelLeave(body.leaveId, body.userId); break;
       case 'getAllTeacherStats':       res = getAllTeacherStats(); break;
+      // ── User Profile ──
+      case 'getUserProfile':          res = getUserProfile(body.userId); break;
+      case 'updateUserProfile':       res = updateUserProfile(body.userId, body.profile); break;
+      case 'changePassword':          res = changePassword(body.userId, body.oldPassword, body.newPassword); break;
       // ── Acting Director ──
       case 'setActingDirector':       res = setActingDirector(body.date, body.userId); break;
       case 'getActingDirectorList':   res = getActingDirectorList(); break;
@@ -1073,4 +1077,59 @@ function getPersonnelDashboard() {
   }
   return Object.keys(st).map(function(k){return st[k];})
     .sort(function(a,b){return b.total-a.total;});
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  USER PROFILE
+// ═══════════════════════════════════════════════════════════════
+
+/** ดึงข้อมูลส่วนตัวของ user */
+function getUserProfile(userId) {
+  var rows = ssheet().getSheetByName('Users').getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (rows[i][0] == userId) {
+      return {
+        status: 'success',
+        profile: {
+          id:        rows[i][0],
+          username:  rows[i][1],
+          name:      rows[i][3],
+          role:      rows[i][4],
+          position:  rows[i][5],
+          lineToken: rows[i][6] || ''
+        }
+      };
+    }
+  }
+  return { status: 'error', message: 'ไม่พบข้อมูลผู้ใช้' };
+}
+
+/** แก้ไขข้อมูลส่วนตัว (ชื่อ, ตำแหน่ง, LINE Token) */
+function updateUserProfile(userId, profile) {
+  var sh   = ssheet().getSheetByName('Users');
+  var rows = sh.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (rows[i][0] != userId) continue;
+    if (profile.name)     sh.getRange(i+1, 4).setValue(profile.name);
+    if (profile.position !== undefined) sh.getRange(i+1, 6).setValue(profile.position);
+    if (profile.lineToken !== undefined) sh.getRange(i+1, 7).setValue(profile.lineToken);
+    return { status: 'success', message: 'บันทึกข้อมูลเรียบร้อยแล้ว' };
+  }
+  return { status: 'error', message: 'ไม่พบผู้ใช้งาน' };
+}
+
+/** เปลี่ยนรหัสผ่าน */
+function changePassword(userId, oldPassword, newPassword) {
+  var sh   = ssheet().getSheetByName('Users');
+  var rows = sh.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (rows[i][0] != userId) continue;
+    if (rows[i][2] != oldPassword)
+      return { status: 'error', message: 'รหัสผ่านเดิมไม่ถูกต้อง' };
+    if (!newPassword || newPassword.length < 6)
+      return { status: 'error', message: 'รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร' };
+    sh.getRange(i+1, 3).setValue(newPassword);
+    return { status: 'success', message: 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว' };
+  }
+  return { status: 'error', message: 'ไม่พบผู้ใช้งาน' };
 }

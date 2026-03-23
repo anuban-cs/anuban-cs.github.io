@@ -62,11 +62,18 @@ const app = (() => {
       allMenus = commonMenus;
     } else {
       const roleMenus = menus[role] || [];
-      // กรอง commonMenus ที่ไม่ซ้ำกับ roleMenus
       const roleFns = new Set(roleMenus.map(m => m.fn));
       const filtered = commonMenus.filter(m => !roleFns.has(m.fn));
       allMenus = [...roleMenus, ...filtered];
     }
+
+    // เพิ่มเมนูโปรไฟล์ให้ทุก Role เสมอ (วางท้ายสุด)
+    const profileMenu = {
+      title: 'ข้อมูลส่วนตัว', sub: 'แก้ไขชื่อ ตำแหน่ง รหัสผ่าน LINE ID',
+      color: 'secondary', icon: 'bi-person-circle',
+      fn: 'profile.openProfile()'
+    };
+    allMenus = [...allMenus, profileMenu];
 
     document.getElementById('menu-area').innerHTML = allMenus.map(m => `
       <div class="col-md-4 mb-3">
