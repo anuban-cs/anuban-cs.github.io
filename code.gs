@@ -91,6 +91,16 @@ function doPost(e) {
       case 'getResearchList':         res = getResearchList(body.filters); break;
       case 'deleteResearch':          res = deleteResearch(body.researchId, body.userId); break;
       case 'updateResearch':          res = updateResearch(body.researchId, body.form, body.userId); break;
+      // ── Evaluation ──
+      case 'getEvalPeriods':          res = getEvalPeriods(); break;
+      case 'createEvalPeriod':        res = createEvalPeriod(body.form); break;
+      case 'assignEvaluators':        res = assignEvaluators(body.periodId, body.teacherId, body.evaluatorIds); break;
+      case 'submitEvalFiles':         res = submitEvalFiles(body.periodId, body.userId, body.files); break;
+      case 'getMyEvalStatus':         res = getMyEvalStatus(body.userId); break;
+      case 'getEvalBoard':            res = getEvalBoard(body.periodId, body.userId, body.role); break;
+      case 'submitScore':             res = submitScore(body.periodId, body.teacherId, body.evaluatorId, body.scores); break;
+      case 'getEvalSummary':          res = getEvalSummary(body.periodId); break;
+      case 'deleteEvalPeriod':        res = deleteEvalPeriod(body.periodId); break;
       default: res = { status: 'error', message: 'Unknown action: ' + act };
     }
     return jsonOut(res);
@@ -1287,4 +1297,343 @@ function buildResearchFlex(teacher, subject, title, type, date, school, url) {
         action:{type:'uri', label:'📊 ดูรายงานวิจัย', uri:url}}]
     } : undefined
   };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EVALUATION — ระบบประเมินผลการปฏิบัติงาน
+//
+//  Sheets ที่ต้องสร้าง:
+//  EvalPeriods  : PeriodID | Name | Round | Year | StartDate | EndDate | Status | CreatedBy
+//  EvalAssign   : AssignID | PeriodID | TeacherID | EvaluatorID | CreatedAt
+//  EvalFiles    : FileID | PeriodID | TeacherID | FileType(eval/sar) | FileUrl | FileName | UploadAt
+//  EvalScores   : ScoreID | PeriodID | TeacherID | EvaluatorID | Org1 | Org2 | Org3 | Total | ScoredAt | Comment
+// ═══════════════════════════════════════════════════════════════
+
+// วิทยฐานะ → ฉลาก
+function getAcademicLevel(position) {
+  if (!position) return 'ยังไม่มีวิทยฐานะ';
+  if (position.indexOf('ผู้ช่วย') >= 0) return 'ครูผู้ช่วย';
+  if (position.indexOf('เชี่ยวชาญพิเศษ') >= 0) return 'ครูเชี่ยวชาญพิเศษ';
+  if (position.indexOf('เชี่ยวชาญ') >= 0) return 'ครูเชี่ยวชาญ';
+  if (position.indexOf('ชำนาญการพิเศษ') >= 0) return 'ครูชำนาญการพิเศษ';
+  if (position.indexOf('ชำนาญการ') >= 0) return 'ครูชำนาญการ';
+  return 'ยังไม่มีวิทยฐานะ';
+}
+
+/** ดึงรอบประเมินทั้งหมด */
+function getEvalPeriods() {
+  var sh = ssheet().getSheetByName('EvalPeriods');
+  if (!sh) return [];
+  var rows = sh.getDataRange().getValues();
+  var uRows = ssheet().getSheetByName('Users').getDataRange().getValues();
+  var uMap = {};
+  for (var u=1;u<uRows.length;u++) uMap[uRows[u][0]] = uRows[u][3];
+  var out = [];
+  for (var i=rows.length-1;i>=1;i--) {
+    if (!rows[i][0]) continue;
+    out.push({
+      id:        rows[i][0],
+      name:      rows[i][1],
+      round:     rows[i][2],
+      year:      rows[i][3],
+      startDate: rows[i][4],
+      endDate:   rows[i][5],
+      status:    rows[i][6],
+      createdBy: uMap[rows[i][7]] || rows[i][7]
+    });
+  }
+  return out;
+}
+
+/** สร้างรอบประเมินใหม่ */
+function createEvalPeriod(form) {
+  var sh = ssheet().getSheetByName('EvalPeriods');
+  if (!sh) return {status:'error', message:'ไม่พบ Sheet EvalPeriods'};
+  var tz = Session.getScriptTimeZone();
+  var id = 'EP-' + Utilities.formatDate(new Date(), tz, 'yyMMddHHmmss');
+  sh.appendRow([id, form.name, form.round, form.year,
+    form.startDate, form.endDate, 'เปิด', form.userId]);
+  return {status:'success', message:'สร้างรอบประเมินเรียบร้อย', id: id};
+}
+
+function deleteEvalPeriod(periodId) {
+  var sh = ssheet().getSheetByName('EvalPeriods');
+  var rows = sh.getDataRange().getValues();
+  for (var i=1;i<rows.length;i++) {
+    if (rows[i][0] == periodId) { sh.deleteRow(i+1); break; }
+  }
+  return {status:'success', message:'ลบรอบประเมินแล้ว'};
+}
+
+/** กำหนดคณะกรรมการประเมินให้ครูแต่ละคน */
+function assignEvaluators(periodId, teacherId, evaluatorIds) {
+  var sh = ssheet().getSheetByName('EvalAssign');
+  if (!sh) return {status:'error', message:'ไม่พบ Sheet EvalAssign'};
+  var tz = Session.getScriptTimeZone();
+  var now = Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm');
+  // ลบการกำหนดเดิมของครูคนนี้ในรอบนี้
+  var rows = sh.getDataRange().getValues();
+  for (var i=rows.length-1;i>=1;i--) {
+    if (rows[i][1]==periodId && rows[i][2]==teacherId) sh.deleteRow(i+1);
+  }
+  // บันทึกใหม่
+  evaluatorIds.forEach(function(eid) {
+    var id = 'EA-' + Utilities.getUuid().substring(0,8);
+    sh.appendRow([id, periodId, teacherId, eid, now]);
+  });
+
+  // แจ้งกรรมการทาง LINE
+  var teacher = getUserInfo(teacherId);
+  evaluatorIds.forEach(function(eid) {
+    var lid = getLineId(eid);
+    if (lid) lineText(lid,
+      '📋 แจ้งการประเมินผลการปฏิบัติงาน
+'
+      +'คุณได้รับมอบหมายให้เป็นกรรมการประเมิน
+'
+      +'ครูที่ประเมิน: '+teacher.name+'
+'
+      +'กรุณาเข้าระบบเพื่อดำเนินการ');
+  });
+  return {status:'success', message:'กำหนดกรรมการเรียบร้อย'};
+}
+
+/** ครู upload ไฟล์ประเมิน (eval/sar) */
+function submitEvalFiles(periodId, userId, files) {
+  try {
+    var cfg = getConfig();
+    var sh  = ssheet().getSheetByName('EvalFiles');
+    if (!sh) return {status:'error', message:'ไม่พบ Sheet EvalFiles'};
+    var tz  = Session.getScriptTimeZone();
+    var now = Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm');
+    var folder = DriveApp.getFolderById(cfg.DRIVE_FOLDER_ID);
+
+    files.forEach(function(f) {
+      // ลบไฟล์เดิม (ถ้ามี)
+      var rows = sh.getDataRange().getValues();
+      for (var i=rows.length-1;i>=1;i--) {
+        if (rows[i][1]==periodId && rows[i][2]==userId && rows[i][3]==f.fileType)
+          sh.deleteRow(i+1);
+      }
+      // upload
+      var blob = Utilities.newBlob(Utilities.base64Decode(f.content), f.type, f.name);
+      var driveFile = folder.createFile(blob);
+      driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      var fid = 'EF-' + Utilities.getUuid().substring(0,8);
+      sh.appendRow([fid, periodId, userId, f.fileType, driveFile.getUrl(), f.name, now]);
+    });
+
+    // แจ้งกรรมการ
+    var aRows = ssheet().getSheetByName('EvalAssign').getDataRange().getValues();
+    var teacher = getUserInfo(userId);
+    for (var i=1;i<aRows.length;i++) {
+      if (aRows[i][1]!=periodId || aRows[i][2]!=userId) continue;
+      var lid = getLineId(aRows[i][3]);
+      if (lid) lineText(lid,
+        '📄 ครู'+teacher.name+' ส่งเอกสารประเมินแล้ว
+'
+        +'กรุณาเข้าระบบเพื่อตรวจสอบและให้คะแนน');
+    }
+    // แจ้ง Director
+    notifyRole('Director',
+      '📄 ครู'+teacher.name+' ส่งเอกสารประเมินผลการปฏิบัติงานแล้ว');
+
+    return {status:'success', message:'อัปโหลดเอกสารเรียบร้อยแล้ว'};
+  } catch(e) { return {status:'error', message:e.toString()}; }
+}
+
+/** สถานะการส่งเอกสารของครูแต่ละรอบ */
+function getMyEvalStatus(userId) {
+  var pRows = ssheet().getSheetByName('EvalPeriods').getDataRange().getValues();
+  var fRows = ssheet().getSheetByName('EvalFiles').getDataRange().getValues();
+  var aRows = ssheet().getSheetByName('EvalAssign').getDataRange().getValues();
+  var sRows = ssheet().getSheetByName('EvalScores').getDataRange().getValues();
+  var uInfo = getUserInfo(userId);
+
+  var out = [];
+  for (var i=pRows.length-1;i>=1;i--) {
+    if (!pRows[i][0] || pRows[i][6]!='เปิด') continue;
+    var pid = pRows[i][0];
+    var evalFile = null, sarFile = null, myScore = null;
+    var isEvaluator = false;
+
+    // ไฟล์ที่ครูส่ง
+    for (var j=1;j<fRows.length;j++) {
+      if (fRows[j][1]!=pid || fRows[j][2]!=userId) continue;
+      if (fRows[j][3]=='eval') evalFile = {url:fRows[j][4], name:fRows[j][5], uploadAt:fRows[j][6]};
+      if (fRows[j][3]=='sar')  sarFile  = {url:fRows[j][4], name:fRows[j][5], uploadAt:fRows[j][6]};
+    }
+    // คะแนนตัวเอง (ประเมินตนเอง)
+    for (var k=1;k<sRows.length;k++) {
+      if (sRows[k][1]==pid && sRows[k][2]==userId && sRows[k][3]==userId)
+        myScore = {org1:sRows[k][4], org2:sRows[k][5], org3:sRows[k][6], total:sRows[k][7]};
+    }
+    // ตรวจว่าเป็นกรรมการประเมินใครบ้าง
+    var evalTargets = [];
+    for (var a=1;a<aRows.length;a++) {
+      if (aRows[a][1]==pid && aRows[a][3]==userId) evalTargets.push(aRows[a][2]);
+    }
+
+    out.push({
+      periodId:    pid,
+      periodName:  pRows[i][1],
+      round:       pRows[i][2],
+      year:        pRows[i][3],
+      startDate:   pRows[i][4],
+      endDate:     pRows[i][5],
+      evalFile:    evalFile,
+      sarFile:     sarFile,
+      myScore:     myScore,
+      level:       getAcademicLevel(uInfo.position),
+      evalTargets: evalTargets
+    });
+  }
+  return out;
+}
+
+/** กระดานประเมิน (กรรมการ/ผอ. เห็นรายชื่อครูที่ต้องประเมิน) */
+function getEvalBoard(periodId, userId, role) {
+  var aRows = ssheet().getSheetByName('EvalAssign').getDataRange().getValues();
+  var fRows = ssheet().getSheetByName('EvalFiles').getDataRange().getValues();
+  var sRows = ssheet().getSheetByName('EvalScores').getDataRange().getValues();
+  var uRows = ssheet().getSheetByName('Users').getDataRange().getValues();
+
+  // Map users
+  var uMap = {};
+  for (var u=1;u<uRows.length;u++)
+    uMap[uRows[u][0]] = {name:uRows[u][3], position:uRows[u][5], role:uRows[u][4]};
+
+  // ถ้า Director → เห็นทุกคน; ถ้ากรรมการ → เห็นเฉพาะที่ตัวเองถูกมอบหมาย
+  var targets = {};
+  for (var i=1;i<aRows.length;i++) {
+    if (aRows[i][1] != periodId) continue;
+    if (role !== 'Director' && aRows[i][3] != userId) continue;
+    var tid = aRows[i][2];
+    if (!targets[tid]) {
+      targets[tid] = {
+        teacherId:   tid,
+        teacherName: (uMap[tid]||{}).name || tid,
+        position:    (uMap[tid]||{}).position || '',
+        level:       getAcademicLevel((uMap[tid]||{}).position),
+        evaluators:  [],
+        evalFile:    null,
+        sarFile:     null,
+        scores:      [],
+        myScored:    false
+      };
+    }
+    if (targets[tid].evaluators.indexOf(aRows[i][3]) < 0)
+      targets[tid].evaluators.push(aRows[i][3]);
+  }
+
+  // ไฟล์
+  for (var j=1;j<fRows.length;j++) {
+    if (fRows[j][1]!=periodId || !targets[fRows[j][2]]) continue;
+    var t = targets[fRows[j][2]];
+    if (fRows[j][3]=='eval') t.evalFile = {url:fRows[j][4], name:fRows[j][5], uploadAt:fRows[j][6]};
+    if (fRows[j][3]=='sar')  t.sarFile  = {url:fRows[j][4], name:fRows[j][5], uploadAt:fRows[j][6]};
+  }
+
+  // คะแนน
+  for (var k=1;k<sRows.length;k++) {
+    if (sRows[k][1]!=periodId || !targets[sRows[k][2]]) continue;
+    var t = targets[sRows[k][2]];
+    t.scores.push({
+      evaluatorId:   sRows[k][3],
+      evaluatorName: (uMap[sRows[k][3]]||{}).name || sRows[k][3],
+      org1: sRows[k][4], org2: sRows[k][5], org3: sRows[k][6],
+      total: sRows[k][7], comment: sRows[k][8], scoredAt: sRows[k][9] || sRows[k][10]
+    });
+    if (sRows[k][3] == userId) t.myScored = true;
+  }
+
+  return Object.values(targets);
+}
+
+/** บันทึกคะแนน */
+function submitScore(periodId, teacherId, evaluatorId, scores) {
+  var sh = ssheet().getSheetByName('EvalScores');
+  if (!sh) return {status:'error', message:'ไม่พบ Sheet EvalScores'};
+  var tz  = Session.getScriptTimeZone();
+  var now = Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm');
+  var org1 = parseFloat(scores.org1)||0;
+  var org2 = parseFloat(scores.org2)||0;
+  var org3 = parseFloat(scores.org3)||0;
+
+  // ตรวจ max
+  if (org1>80) return {status:'error', message:'องค์ประกอบที่ 1 ต้องไม่เกิน 80 คะแนน'};
+  if (org2>10) return {status:'error', message:'องค์ประกอบที่ 2 ต้องไม่เกิน 10 คะแนน'};
+  if (org3>10) return {status:'error', message:'องค์ประกอบที่ 3 ต้องไม่เกิน 10 คะแนน'};
+
+  var total = org1+org2+org3;
+  var rows  = sh.getDataRange().getValues();
+
+  // อัปเดตถ้ามีอยู่แล้ว
+  for (var i=1;i<rows.length;i++) {
+    if (rows[i][1]==periodId && rows[i][2]==teacherId && rows[i][3]==evaluatorId) {
+      sh.getRange(i+1,5).setValue(org1);
+      sh.getRange(i+1,6).setValue(org2);
+      sh.getRange(i+1,7).setValue(org3);
+      sh.getRange(i+1,8).setValue(total);
+      sh.getRange(i+1,9).setValue(scores.comment||'');
+      sh.getRange(i+1,10).setValue(now);
+      return {status:'success', message:'บันทึกคะแนนเรียบร้อย คะแนนรวม: '+total+'/100'};
+    }
+  }
+
+  // บันทึกใหม่
+  var sid = 'ES-' + Utilities.getUuid().substring(0,8);
+  sh.appendRow([sid, periodId, teacherId, evaluatorId, org1, org2, org3, total, scores.comment||'', now]);
+
+  // แจ้งครูที่ถูกประเมิน
+  var lid = getLineId(teacherId);
+  var evInfo = getUserInfo(evaluatorId);
+  if (lid) lineText(lid,
+    '✅ มีคะแนนประเมินใหม่
+'
+    +'ผู้ประเมิน: '+evInfo.name+'
+'
+    +'คะแนนรวม: '+total+'/100 คะแนน
+'
+    +'กรุณาเข้าระบบเพื่อดูรายละเอียด');
+
+  return {status:'success', message:'บันทึกคะแนนเรียบร้อย คะแนนรวม: '+total+'/100'};
+}
+
+/** สรุปผลการประเมินทั้งรอบ (Director) */
+function getEvalSummary(periodId) {
+  var board = getEvalBoard(periodId, '', 'Director');
+  return board.map(function(t) {
+    var avgOrg1=0, avgOrg2=0, avgOrg3=0, avgTotal=0;
+    if (t.scores.length) {
+      t.scores.forEach(function(s){avgOrg1+=s.org1;avgOrg2+=s.org2;avgOrg3+=s.org3;avgTotal+=s.total;});
+      avgOrg1  = (avgOrg1/t.scores.length).toFixed(2);
+      avgOrg2  = (avgOrg2/t.scores.length).toFixed(2);
+      avgOrg3  = (avgOrg3/t.scores.length).toFixed(2);
+      avgTotal = (avgTotal/t.scores.length).toFixed(2);
+    }
+    return {
+      teacherId:   t.teacherId,
+      teacherName: t.teacherName,
+      level:       t.level,
+      position:    t.position,
+      hasEvalFile: !!t.evalFile,
+      hasSarFile:  !!t.sarFile,
+      scoreCount:  t.scores.length,
+      evalCount:   t.evaluators.length,
+      avgOrg1:     avgOrg1,
+      avgOrg2:     avgOrg2,
+      avgOrg3:     avgOrg3,
+      avgTotal:    avgTotal,
+      grade:       gradeFromScore(parseFloat(avgTotal))
+    };
+  });
+}
+
+function gradeFromScore(score) {
+  if (score >= 90) return {label:'ดีเด่น', color:'success'};
+  if (score >= 80) return {label:'ดีมาก', color:'primary'};
+  if (score >= 70) return {label:'ดี', color:'info'};
+  if (score >= 60) return {label:'พอใช้', color:'warning'};
+  return {label:'ต้องปรับปรุง', color:'danger'};
 }

@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ประเมินผลการปฏิบัติงาน | โรงเรียนอนุบาลชุมแสง</title>
+  <link rel="icon" href="favicon.ico">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="config.js"></script>
+<style>
+:root {
+  --navy:   #1e3a5f;
+  --blue:   #2563eb;
+  --sky:    #dbeafe;
+  --gold:   #f59e0b;
+  --gold-l: #fef3c7;
+  --green:  #059669;
+  --red:    #dc2626;
+  --gray:   #f8fafc;
+  --border: #e2e8f0;
+  --radius: 14px;
+  --shadow: 0 2px 16px rgba(30,58,95,0.10);
+}
+*{font-family:'Sarabun',sans-serif;box-sizing:border-box}
+h1,h2,h3,h4,h5,h6,.heading{font-family:'Kanit',sans-serif}
+
+body{background:linear-gradient(160deg,#eff6ff 0%,#fef9c3 100%);min-height:100vh;color:#0f172a}
+
+/* Header */
+.page-header{background:linear-gradient(135deg,var(--navy) 0%,#1e40af 100%);
+  padding:24px 0;box-shadow:0 4px 24px rgba(30,58,95,.3)}
+.page-header h1{font-size:1.3rem;color:#fff;font-weight:600;margin:0}
+.page-header p{color:rgba(255,255,255,.75);font-size:.82rem;margin:2px 0 0}
+.school-logo{width:52px;height:52px;border-radius:50%;object-fit:cover;
+  border:2.5px solid rgba(255,255,255,.5)}
+
+/* Tabs */
+.nav-pills .nav-link{color:var(--navy);font-weight:500;border-radius:8px;
+  padding:8px 18px;font-size:.9rem}
+.nav-pills .nav-link.active{background:var(--blue);color:#fff}
+
+/* Card */
+.card{border:1.5px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);background:#fff}
+.card-header-navy{background:linear-gradient(135deg,var(--navy),#1e40af);
+  color:#fff;border-radius:var(--radius) var(--radius) 0 0;padding:14px 20px}
+.card-header-gold{background:linear-gradient(135deg,var(--gold),#d97706);
+  color:#fff;border-radius:var(--radius) var(--radius) 0 0;padding:14px 20px}
+
+/* Period badge */
+.period-card{cursor:pointer;transition:all .2s;border:2px solid transparent}
+.period-card:hover,.period-card.selected{border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.period-status{display:inline-block;padding:2px 10px;border-radius:20px;
+  font-size:.75rem;font-weight:600}
+.status-เปิด{background:#dcfce7;color:#16a34a}
+.status-ปิด{background:#fee2e2;color:#dc2626}
+
+/* Score form */
+.score-group{background:var(--sky);border-radius:12px;padding:16px 20px;margin-bottom:12px}
+.score-group label{font-weight:600;color:var(--navy);font-size:.9rem}
+.score-max{font-size:.78rem;color:#64748b;margin-left:6px}
+.score-input{max-width:100px;font-size:1.1rem;font-weight:700;
+  text-align:center;border:2px solid var(--blue);border-radius:10px}
+.score-bar{height:8px;border-radius:20px;background:#e2e8f0;margin-top:6px}
+.score-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--blue),#7c3aed);
+  transition:width .4s}
+
+/* File upload */
+.file-zone{border:2.5px dashed #93c5fd;border-radius:12px;
+  background:linear-gradient(135deg,#eff6ff,#fef9c3);
+  padding:24px;text-align:center;cursor:pointer;transition:all .2s}
+.file-zone:hover{border-color:var(--blue);transform:translateY(-2px)}
+.file-badge{display:flex;align-items:center;gap:10px;background:#f0fdf4;
+  border:1.5px solid #86efac;border-radius:10px;padding:10px 14px;margin-top:8px}
+
+/* Table */
+.eval-table thead th{background:linear-gradient(135deg,var(--navy),#1e40af);
+  color:#fff;font-family:'Kanit',sans-serif;font-size:.83rem;
+  padding:12px 14px;border:none;white-space:nowrap}
+.eval-table td{vertical-align:middle;font-size:.87rem;border-color:var(--border)}
+.eval-table tr:hover td{background:var(--sky)}
+
+/* Level badge */
+.level-badge{font-size:.72rem;padding:3px 10px;border-radius:20px;
+  font-weight:600;white-space:nowrap}
+.lv-0{background:#fef3c7;color:#92400e}
+.lv-1{background:#dbeafe;color:#1e40af}
+.lv-2{background:#d1fae5;color:#065f46}
+.lv-3{background:#ede9fe;color:#5b21b6}
+.lv-4{background:#fce7f3;color:#9d174d}
+.lv-5{background:#fee2e2;color:#991b1b}
+
+/* Grade */
+.grade-badge{font-size:.8rem;padding:4px 12px;border-radius:20px;font-weight:700}
+
+/* Progress ring */
+.score-ring{width:70px;height:70px;position:relative;flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring .ring-num{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-family:'Kanit',sans-serif;font-size:1.1rem;
+  font-weight:700;color:var(--navy)}
+
+/* Loading */
+.overlay{display:none;position:fixed;inset:0;background:rgba(30,58,95,.15);
+  backdrop-filter:blur(4px);z-index:9999;align-items:center;
+  justify-content:center;flex-direction:column;gap:14px}
+.spin{width:50px;height:50px;border:5px solid rgba(37,99,235,.2);
+  border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="spin"></div>
+  <p style="color:var(--navy);font-weight:600;font-family:'Kanit',sans-serif" id="overlay-text">กำลังดำเนินการ...</p>
+</div>
+
+<!-- Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-3">
+        <img src="logoAbCs.jpg" class="school-logo" alt="logo">
+        <div>
+          <h1><i class="bi bi-clipboard2-check-fill me-2"></i>ประเมินผลการปฏิบัติงาน</h1>
+          <p>โรงเรียนอนุบาลชุมแสง (วัดทับกฤชกลาง)</p>
+        </div>
+      </div>
+      <a href="index.html" style="color:rgba(255,255,255,.8);text-decoration:none;font-size:.85rem">
+        <i class="bi bi-arrow-left-circle me-1"></i>กลับสู่ระบบหลัก
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4 pb-5">
+
+  <!-- User info bar -->
+  <div class="alert d-flex align-items-center gap-3 mb-4"
+    style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius)">
+    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold"
+      style="width:42px;height:42px;font-size:1.1rem;flex-shrink:0" id="user-avatar">?</div>
+    <div class="flex-grow-1">
+      <div class="fw-bold" id="user-name">กำลังโหลด...</div>
+      <small class="text-muted" id="user-detail"></small>
+    </div>
+    <span class="badge fs-6" style="background:var(--navy)" id="user-level">-</span>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-pills mb-4 gap-1" id="mainTabs">
+    <li class="nav-item">
+      <a class="nav-link active" href="#" onclick="showTab('teacher')">
+        <i class="bi bi-person-check-fill me-1"></i>รายงานผลการปฏิบัติงาน
+      </a>
+    </li>
+    <li class="nav-item" id="tab-evaluator" style="display:none">
+      <a class="nav-link" href="#" onclick="showTab('evaluator')">
+        <i class="bi bi-star-fill me-1"></i>ประเมินครู
+        <span class="badge bg-danger ms-1" id="pending-count" style="display:none">!</span>
+      </a>
+    </li>
+    <li class="nav-item" id="tab-director" style="display:none">
+      <a class="nav-link" href="#" onclick="showTab('director')">
+        <i class="bi bi-bar-chart-fill me-1"></i>จัดการ & สรุปผล
+      </a>
+    </li>
+  </ul>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- TAB: ครู — รายงานผล + Upload ไฟล์                 -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div id="pane-teacher">
+    <div id="periods-teacher" class="row g-3"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- TAB: กรรมการ — ให้คะแนน                          -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div id="pane-evaluator" class="d-none">
+    <div id="board-evaluator"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- TAB: ผอ. — จัดการรอบ + สรุปผล                    -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div id="pane-director" class="d-none">
+
+    <!-- สร้างรอบประเมิน -->
+    <div class="card mb-4">
+      <div class="card-header-navy d-flex justify-content-between align-items-center">
+        <span class="heading fw-600"><i class="bi bi-plus-circle-fill me-2"></i>สร้างรอบการประเมิน</span>
+        <button class="btn btn-sm btn-outline-light" onclick="toggleCreateForm()">
+          <i class="bi bi-chevron-down" id="create-chevron"></i>
+        </button>
+      </div>
+      <div class="card-body d-none" id="create-form-area">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label fw-bold">ชื่อรอบประเมิน <span class="text-danger">*</span></label>
+            <input class="form-control" id="ep-name" placeholder="เช่น ประเมินผล ครั้งที่ 1/2568">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-bold">ครั้งที่</label>
+            <select class="form-select" id="ep-round">
+              <option value="1">ครั้งที่ 1</option>
+              <option value="2">ครั้งที่ 2</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-bold">ปีการศึกษา</label>
+            <input class="form-control" id="ep-year" placeholder="2568">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-bold">วันเริ่ม</label>
+            <input type="date" class="form-control" id="ep-start">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-bold">วันสิ้นสุด</label>
+            <input type="date" class="form-control" id="ep-end">
+          </div>
+        </div>
+        <button class="btn btn-primary mt-3" onclick="createPeriod()">
+          <i class="bi bi-save-fill me-1"></i>สร้างรอบประเมิน
+        </button>
+      </div>
+    </div>
+
+    <!-- รอบประเมินทั้งหมด -->
+    <div class="card mb-4">
+      <div class="card-header-navy">
+        <span class="heading fw-600"><i class="bi bi-list-check me-2"></i>รอบการประเมินทั้งหมด</span>
+      </div>
+      <div class="card-body" id="periods-director"></div>
+    </div>
+
+    <!-- กระดานสรุปผล -->
+    <div class="card d-none" id="summary-card">
+      <div class="card-header-gold d-flex justify-content-between align-items-center">
+        <span class="heading fw-600"><i class="bi bi-trophy-fill me-2"></i>สรุปผลการประเมิน</span>
+        <span class="badge bg-light text-dark" id="summary-period-name"></span>
+      </div>
+      <div class="card-body p-0" id="summary-body"></div>
+    </div>
+
+    <!-- กำหนดกรรมการ -->
+    <div class="card d-none mt-4" id="assign-card">
+      <div class="card-header-navy">
+        <span class="heading fw-600"><i class="bi bi-people-fill me-2"></i>กำหนดคณะกรรมการประเมิน</span>
+      </div>
+      <div class="card-body" id="assign-body"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Score Modal -->
+<div class="modal fade" id="scoreModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="border-radius:18px;border:2px solid var(--sky)">
+      <div class="modal-header" style="background:linear-gradient(135deg,var(--navy),#1e40af);border-radius:16px 16px 0 0">
+        <div>
+          <h5 class="modal-title text-white heading">
+            <i class="bi bi-star-fill me-2"></i>ให้คะแนนประเมิน
+          </h5>
+          <small class="text-white opacity-75" id="score-teacher-name"></small>
+        </div>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="score-period-id">
+        <input type="hidden" id="score-teacher-id">
+
+        <!-- วิทยฐานะ -->
+        <div class="alert alert-info d-flex align-items-center gap-2 mb-4 py-2" id="score-level-info">
+          <i class="bi bi-info-circle-fill"></i>
+          <span id="score-level-text"></span>
+        </div>
+
+        <!-- องค์ประกอบที่ 1 -->
+        <div class="score-group">
+          <label>องค์ประกอบที่ 1 : ประสิทธิภาพและประสิทธิผลการปฏิบัติงาน
+            <span class="score-max">(คะแนนเต็ม 80)</span>
+          </label>
+          <div class="d-flex align-items-center gap-3 mt-2">
+            <input type="number" class="form-control score-input" id="s-org1"
+              min="0" max="80" step="0.5" placeholder="0" oninput="updateBar(1)">
+            <div class="flex-grow-1">
+              <div class="score-bar"><div class="score-fill" id="bar1" style="width:0%"></div></div>
+              <small class="text-muted" id="bar1-pct">0/80</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- องค์ประกอบที่ 2 -->
+        <div class="score-group">
+          <label>องค์ประกอบที่ 2 : การมีส่วนร่วมในการพัฒนาการศึกษา
+            <span class="score-max">(คะแนนเต็ม 10)</span>
+          </label>
+          <div class="d-flex align-items-center gap-3 mt-2">
+            <input type="number" class="form-control score-input" id="s-org2"
+              min="0" max="10" step="0.5" placeholder="0" oninput="updateBar(2)">
+            <div class="flex-grow-1">
+              <div class="score-bar"><div class="score-fill" id="bar2" style="width:0%"></div></div>
+              <small class="text-muted" id="bar2-pct">0/10</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- องค์ประกอบที่ 3 -->
+        <div class="score-group">
+          <label>องค์ประกอบที่ 3 : การปฏิบัติตนในการรักษาวินัย คุณธรรม จริยธรรม
+            <span class="score-max">(คะแนนเต็ม 10)</span>
+          </label>
+          <div class="d-flex align-items-center gap-3 mt-2">
+            <input type="number" class="form-control score-input" id="s-org3"
+              min="0" max="10" step="0.5" placeholder="0" oninput="updateBar(3)">
+            <div class="flex-grow-1">
+              <div class="score-bar"><div class="score-fill" id="bar3" style="width:0%"></div></div>
+              <small class="text-muted" id="bar3-pct">0/10</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- คะแนนรวม -->
+        <div class="text-center my-3 p-3"
+          style="background:linear-gradient(135deg,var(--navy),#1e40af);border-radius:14px;color:#fff">
+          <div style="font-size:.9rem;opacity:.85">คะแนนรวม</div>
+          <div class="heading fw-700" style="font-size:2.2rem" id="total-score">0</div>
+          <div style="font-size:.8rem;opacity:.75">จาก 100 คะแนน</div>
+        </div>
+
+        <!-- ความเห็น -->
+        <div>
+          <label class="form-label fw-bold">ความเห็นเพิ่มเติม (ถ้ามี)</label>
+          <textarea class="form-control" id="s-comment" rows="2"
+            placeholder="ข้อเสนอแนะหรือความเห็นของผู้ประเมิน"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-primary px-4" onclick="saveScore()">
+          <i class="bi bi-save-fill me-1"></i>บันทึกคะแนน
+        </button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ─── State ──────────────────────────────────────────────────────
+let CU = null; // current user
+let allPeriods = [], myEvalStatus = [], boardData = [];
+let selectedPeriodId = null, allUsers = [];
+
+// ─── Init ────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const raw = localStorage.getItem(APP_CONFIG.SESSION_KEY);
+    if (!raw) { location.href='index.html'; return; }
+    const s = JSON.parse(raw);
+    CU = s.user;
+  } catch(e) { location.href='index.html'; return; }
+
+  // UI user info
+  document.getElementById('user-name').textContent   = CU.name;
+  document.getElementById('user-detail').textContent = CU.role + (CU.position ? ' — ' + CU.position : '');
+  document.getElementById('user-avatar').textContent  = CU.name?.charAt(0) || '?';
+
+  // แสดงแท็บตาม Role
+  const isDirector = CU.role === 'Director';
+  document.getElementById('tab-director').style.display = isDirector ? '' : 'none';
+  // กรรมการจะถูกตรวจสอบหลังโหลดข้อมูล
+
+  await loadData();
+});
+
+// ─── Load All Data ───────────────────────────────────────────────
+async function loadData() {
+  showOverlay('กำลังโหลดข้อมูล...');
+  try {
+    const [status, periods] = await Promise.all([
+      apiCall('getMyEvalStatus', {}),
+      apiCall('getEvalPeriods', {})
+    ]);
+    myEvalStatus = Array.isArray(status) ? status : [];
+    allPeriods   = Array.isArray(periods) ? periods : [];
+
+    // ตรวจสอบว่าเป็นกรรมการหรือไม่
+    const isEvaluator = myEvalStatus.some(p => p.evalTargets && p.evalTargets.length > 0);
+    if (isEvaluator || CU.role === 'Director' || CU.role === 'Deputy') {
+      document.getElementById('tab-evaluator').style.display = '';
+    }
+
+    // Level badge
+    const level = myEvalStatus[0]?.level || getLevelFromRole(CU.role, CU.position);
+    document.getElementById('user-level').textContent = level;
+
+    renderTeacherPane();
+    if (CU.role === 'Director') renderDirectorPane();
+  } catch(e) {
+    Swal.fire({ icon:'error', title:'โหลดข้อมูลไม่สำเร็จ', text:e.message, confirmButtonColor:'#1e3a5f' });
+  }
+  hideOverlay();
+}
+
+// ─── Tab Switch ──────────────────────────────────────────────────
+function showTab(tab) {
+  document.querySelectorAll('[onclick^="showTab"]').forEach(a => a.classList.remove('active'));
+  event.target.closest('a').classList.add('active');
+  ['teacher','evaluator','director'].forEach(t => {
+    document.getElementById('pane-'+t).classList.toggle('d-none', t !== tab);
+  });
+  if (tab === 'evaluator') renderEvaluatorPane();
+  if (tab === 'director')  renderDirectorPane();
+}
+
+// ─── TEACHER PANE ────────────────────────────────────────────────
+function renderTeacherPane() {
+  const el = document.getElementById('periods-teacher');
+  const openPeriods = myEvalStatus.filter(p => p);
+
+  if (!openPeriods.length) {
+    el.innerHTML = `<div class="col-12 text-center py-5 text-muted">
+      <i class="bi bi-calendar-x" style="font-size:3rem;color:#93c5fd;display:block;margin-bottom:12px"></i>
+      ยังไม่มีรอบการประเมินที่เปิดใช้งาน
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = openPeriods.map(p => `
+    <div class="col-12">
+      <div class="card mb-3">
+        <div class="card-header-navy d-flex justify-content-between align-items-center">
+          <span class="heading fw-600">
+            <i class="bi bi-calendar3 me-2"></i>${p.periodName}
+            <span class="badge bg-warning text-dark ms-2 fw-normal" style="font-size:.75rem">
+              ครั้งที่ ${p.round} / ${p.year}
+            </span>
+          </span>
+          <small style="opacity:.8">${p.startDate} — ${p.endDate}</small>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+
+            <!-- แบบประเมิน -->
+            <div class="col-md-6">
+              <div class="card h-100" style="border:2px solid #bfdbfe">
+                <div class="card-body">
+                  <h6 class="heading fw-bold text-primary mb-3">
+                    <i class="bi bi-file-earmark-check-fill me-1"></i>แบบประเมินผลการปฏิบัติงาน
+                  </h6>
+                  ${p.evalFile
+                    ? `<div class="file-badge mb-2">
+                        <i class="bi bi-file-pdf-fill text-danger fs-4"></i>
+                        <div class="flex-grow-1">
+                          <div class="fw-bold small">${p.evalFile.name}</div>
+                          <div class="text-muted" style="font-size:.75rem">อัปโหลดเมื่อ ${p.evalFile.uploadAt}</div>
+                        </div>
+                        <a href="${p.evalFile.url}" target="_blank" class="btn btn-sm btn-outline-primary">
+                          <i class="bi bi-eye"></i>
+                        </a>
+                      </div>`
+                    : `<div class="text-muted small mb-2"><i class="bi bi-exclamation-circle me-1"></i>ยังไม่ได้อัปโหลด</div>`}
+                  <div class="file-zone" onclick="triggerFile('eval','${p.periodId}')">
+                    <i class="bi bi-cloud-upload text-primary fs-4"></i>
+                    <div class="small mt-1 fw-600 text-primary">
+                      ${p.evalFile ? 'เปลี่ยนไฟล์' : 'อัปโหลดไฟล์'} (PDF)
+                    </div>
+                  </div>
+                  <input type="file" id="file-eval-${p.periodId}" class="d-none" accept=".pdf"
+                    onchange="uploadFile(this,'eval','${p.periodId}')">
+                </div>
+              </div>
+            </div>
+
+            <!-- SAR -->
+            <div class="col-md-6">
+              <div class="card h-100" style="border:2px solid #fde68a">
+                <div class="card-body">
+                  <h6 class="heading fw-bold" style="color:var(--gold)" >
+                    <i class="bi bi-journal-bookmark-fill me-1"></i>รายงานการประเมินตนเอง (SAR)
+                  </h6>
+                  ${p.sarFile
+                    ? `<div class="file-badge mb-2">
+                        <i class="bi bi-file-pdf-fill text-danger fs-4"></i>
+                        <div class="flex-grow-1">
+                          <div class="fw-bold small">${p.sarFile.name}</div>
+                          <div class="text-muted" style="font-size:.75rem">อัปโหลดเมื่อ ${p.sarFile.uploadAt}</div>
+                        </div>
+                        <a href="${p.sarFile.url}" target="_blank" class="btn btn-sm btn-outline-warning">
+                          <i class="bi bi-eye"></i>
+                        </a>
+                      </div>`
+                    : `<div class="text-muted small mb-2"><i class="bi bi-exclamation-circle me-1"></i>ยังไม่ได้อัปโหลด</div>`}
+                  <div class="file-zone" onclick="triggerFile('sar','${p.periodId}')"
+                    style="border-color:#fde68a">
+                    <i class="bi bi-cloud-upload fs-4" style="color:var(--gold)"></i>
+                    <div class="small mt-1 fw-600" style="color:var(--gold)">
+                      ${p.sarFile ? 'เปลี่ยนไฟล์' : 'อัปโหลดไฟล์'} (PDF)
+                    </div>
+                  </div>
+                  <input type="file" id="file-sar-${p.periodId}" class="d-none" accept=".pdf"
+                    onchange="uploadFile(this,'sar','${p.periodId}')">
+                </div>
+              </div>
+            </div>
+
+            <!-- คะแนนที่ได้รับ -->
+            ${p.myScore ? `
+            <div class="col-12">
+              <div class="alert" style="background:var(--sky);border:1.5px solid #93c5fd;border-radius:12px">
+                <h6 class="heading fw-bold text-primary mb-2">
+                  <i class="bi bi-clipboard2-data-fill me-1"></i>คะแนนประเมินตนเอง
+                </h6>
+                <div class="row g-2">
+                  <div class="col-4">
+                    <div class="text-muted small">องค์ประกอบ 1</div>
+                    <div class="fw-bold fs-5 text-primary">${p.myScore.org1}<span class="text-muted fs-6">/80</span></div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-muted small">องค์ประกอบ 2</div>
+                    <div class="fw-bold fs-5 text-primary">${p.myScore.org2}<span class="text-muted fs-6">/10</span></div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-muted small">รวม</div>
+                    <div class="fw-bold fs-5 text-primary">${p.myScore.total}<span class="text-muted fs-6">/100</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── EVALUATOR PANE ──────────────────────────────────────────────
+async function renderEvaluatorPane() {
+  const el = document.getElementById('board-evaluator');
+  el.innerHTML = '<div class="text-center py-4"><div class="spin mx-auto"></div></div>';
+
+  // โหลดข้อมูลทุกรอบที่ตัวเองเป็นกรรมการ
+  let allTargets = [];
+  for (const p of myEvalStatus) {
+    if (!p.evalTargets?.length) continue;
+    const board = await apiCall('getEvalBoard', { periodId: p.periodId, role: CU.role });
+    if (Array.isArray(board)) {
+      board.forEach(t => { t._periodId = p.periodId; t._periodName = p.periodName; });
+      allTargets = allTargets.concat(board);
+    }
+  }
+  // Director เห็นทุกรอบ
+  if (CU.role === 'Director' && selectedPeriodId) {
+    const board = await apiCall('getEvalBoard', { periodId: selectedPeriodId, role: 'Director' });
+    if (Array.isArray(board)) {
+      board.forEach(t => { t._periodId = selectedPeriodId; t._periodName = ''; });
+      allTargets = board;
+    }
+  }
+
+  const pending = allTargets.filter(t => !t.myScored).length;
+  const pendBadge = document.getElementById('pending-count');
+  if (pending > 0) { pendBadge.textContent = pending; pendBadge.style.display = ''; }
+
+  if (!allTargets.length) {
+    el.innerHTML = `<div class="text-center py-5 text-muted">
+      <i class="bi bi-clipboard-x" style="font-size:3rem;color:#93c5fd;display:block;margin-bottom:12px"></i>
+      ยังไม่มีครูที่ต้องประเมิน
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="row g-3">` + allTargets.map(t => `
+    <div class="col-md-6">
+      <div class="card h-100" style="border:2px solid ${t.myScored ? '#86efac' : '#fca5a5'}">
+        <div class="card-body">
+          <div class="d-flex align-items-start justify-content-between mb-3">
+            <div>
+              <div class="fw-bold fs-6">${t.teacherName}</div>
+              <span class="level-badge lv-${levelIdx(t.level)}">${t.level}</span>
+            </div>
+            <span class="badge ${t.myScored ? 'bg-success' : 'bg-danger'}">
+              ${t.myScored ? '✅ ให้คะแนนแล้ว' : '⏳ รอให้คะแนน'}
+            </span>
+          </div>
+
+          <!-- ไฟล์เอกสาร -->
+          <div class="d-flex gap-2 mb-3 flex-wrap">
+            ${t.evalFile
+              ? `<a href="${t.evalFile.url}" target="_blank" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-file-earmark-check me-1"></i>แบบประเมิน
+                </a>`
+              : `<span class="btn btn-sm btn-outline-secondary disabled">
+                  <i class="bi bi-file-earmark-x me-1"></i>ยังไม่ส่งแบบประเมิน
+                </span>`}
+            ${t.sarFile
+              ? `<a href="${t.sarFile.url}" target="_blank" class="btn btn-sm btn-outline-warning">
+                  <i class="bi bi-journal-bookmark me-1"></i>SAR
+                </a>`
+              : `<span class="btn btn-sm btn-outline-secondary disabled">
+                  <i class="bi bi-journal-x me-1"></i>ยังไม่ส่ง SAR
+                </span>`}
+          </div>
+
+          <!-- คะแนนที่ให้ไปแล้ว -->
+          ${t.myScored ? (() => {
+            const myS = t.scores.find(s => s.evaluatorId === CU.id || s.evaluatorName === CU.name);
+            return myS ? `<div class="alert py-2 mb-2" style="background:var(--sky);font-size:.85rem">
+              คะแนนที่ให้: ${myS.org1}+${myS.org2}+${myS.org3} = <b>${myS.total}/100</b>
+            </div>` : '';
+          })() : ''}
+
+          <button class="btn btn-primary w-100"
+            onclick="openScoreModal('${t._periodId}','${t.teacherId}','${t.teacherName}','${t.level}')">
+            <i class="bi bi-star-fill me-1"></i>
+            ${t.myScored ? 'แก้ไขคะแนน' : 'ให้คะแนน'}
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('') + `</div>`;
+}
+
+// ─── DIRECTOR PANE ───────────────────────────────────────────────
+function renderDirectorPane() {
+  renderPeriodsList();
+}
+
+function renderPeriodsList() {
+  const el = document.getElementById('periods-director');
+  if (!allPeriods.length) {
+    el.innerHTML = '<p class="text-muted text-center py-3">ยังไม่มีรอบประเมิน</p>';
+    return;
+  }
+  el.innerHTML = allPeriods.map(p => `
+    <div class="d-flex align-items-center justify-content-between p-3 mb-2
+      border rounded-3 period-card ${selectedPeriodId===p.id?'selected':''}">
+      <div>
+        <div class="fw-bold">${p.name}</div>
+        <small class="text-muted">ครั้งที่ ${p.round} / ${p.year} &nbsp;|&nbsp; ${p.startDate} — ${p.endDate}</small>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="period-status status-${p.status}">${p.status}</span>
+        <button class="btn btn-sm btn-outline-primary"
+          onclick="loadSummary('${p.id}','${p.name}')">
+          <i class="bi bi-bar-chart-fill me-1"></i>สรุปผล
+        </button>
+        <button class="btn btn-sm btn-outline-success"
+          onclick="loadAssign('${p.id}')">
+          <i class="bi bi-people-fill me-1"></i>กรรมการ
+        </button>
+        <button class="btn btn-sm btn-outline-danger"
+          onclick="deletePeriod('${p.id}')">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function loadSummary(periodId, periodName) {
+  selectedPeriodId = periodId;
+  document.getElementById('summary-card').classList.remove('d-none');
+  document.getElementById('summary-period-name').textContent = periodName;
+  const el = document.getElementById('summary-body');
+  el.innerHTML = '<div class="text-center py-4"><div class="spin mx-auto"></div></div>';
+
+  const data = await apiCall('getEvalSummary', { periodId });
+  if (!Array.isArray(data) || !data.length) {
+    el.innerHTML = '<p class="text-muted text-center py-3">ยังไม่มีข้อมูล</p>';
+    return;
+  }
+
+  const gradeColor = {ดีเด่น:'success',ดีมาก:'primary',ดี:'info',พอใช้:'warning',ต้องปรับปรุง:'danger'};
+
+  el.innerHTML = `
+    <div class="table-responsive">
+      <table class="table eval-table mb-0">
+        <thead><tr>
+          <th>#</th><th>ชื่อครู</th><th>วิทยฐานะ</th>
+          <th class="text-center">ส่งแบบประเมิน</th>
+          <th class="text-center">ส่ง SAR</th>
+          <th class="text-center">กรรมการ</th>
+          <th class="text-center">องค์ประกอบ 1</th>
+          <th class="text-center">องค์ประกอบ 2</th>
+          <th class="text-center">องค์ประกอบ 3</th>
+          <th class="text-center">คะแนนเฉลี่ย</th>
+          <th class="text-center">ระดับ</th>
+        </tr></thead>
+        <tbody>
+          ${data.map((r,i) => `<tr>
+            <td>${i+1}</td>
+            <td class="fw-bold">${r.teacherName}</td>
+            <td><span class="level-badge lv-${levelIdx(r.level)}">${r.level}</span></td>
+            <td class="text-center">${r.hasEvalFile ? '✅' : '❌'}</td>
+            <td class="text-center">${r.hasSarFile  ? '✅' : '❌'}</td>
+            <td class="text-center">${r.scoreCount}/${r.evalCount}</td>
+            <td class="text-center">${r.avgOrg1}</td>
+            <td class="text-center">${r.avgOrg2}</td>
+            <td class="text-center">${r.avgOrg3}</td>
+            <td class="text-center fw-bold text-primary fs-6">${r.avgTotal}</td>
+            <td class="text-center">
+              <span class="grade-badge bg-${gradeColor[r.grade?.label]||'secondary'} text-white">
+                ${r.grade?.label||'-'}
+              </span>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+async function loadAssign(periodId) {
+  selectedPeriodId = periodId;
+  document.getElementById('assign-card').classList.remove('d-none');
+  const el = document.getElementById('assign-body');
+  el.innerHTML = '<div class="text-center py-4"><div class="spin mx-auto"></div></div>';
+
+  // โหลด users สำหรับเลือกกรรมการ
+  const board = await apiCall('getEvalBoard', { periodId, role: 'Director' });
+  const uRes  = await apiCall('getTeacherList', {});
+
+  if (!Array.isArray(uRes)) { el.innerHTML='<p class="text-muted">โหลดรายชื่อไม่สำเร็จ</p>'; return; }
+  allUsers = uRes;
+
+  // ครูที่อยู่ในระบบ (Users sheet ทั้งหมดยกเว้น Director/Admin)
+  const teachers = uRes.filter(u => u.role !== 'Admin');
+  const evaluatorOptions = uRes.map(u =>
+    `<option value="${u.id}">${u.name} (${u.role})</option>`).join('');
+
+  el.innerHTML = teachers.map(t => {
+    const existing = Array.isArray(board) ? board.find(b => b.teacherId === t.id) : null;
+    const curEvals = existing?.evaluators || [];
+    return `
+    <div class="border rounded-3 p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span class="fw-bold">${t.name}</span>
+          <span class="level-badge lv-${levelIdx(getLevelFromRole(t.role, t.position))} ms-2">
+            ${getLevelFromRole(t.role, t.position)}
+          </span>
+        </div>
+        <button class="btn btn-sm btn-primary"
+          onclick="saveAssign('${periodId}','${t.id}')">
+          <i class="bi bi-save-fill me-1"></i>บันทึก
+        </button>
+      </div>
+      <label class="form-label small fw-bold text-muted">เลือกคณะกรรมการประเมิน</label>
+      <select class="form-select" multiple id="assign-${t.id}" style="height:120px">
+        ${uRes.map(u => `
+          <option value="${u.id}" ${curEvals.includes(u.id)?'selected':''}>
+            ${u.name} (${u.role})
+          </option>`).join('')}
+      </select>
+      <small class="text-muted">กด Ctrl (Windows) หรือ Cmd (Mac) เพื่อเลือกหลายคน</small>
+    </div>`;
+  }).join('');
+}
+
+async function saveAssign(periodId, teacherId) {
+  const sel = document.getElementById('assign-'+teacherId);
+  const ids = Array.from(sel.selectedOptions).map(o => o.value);
+  if (!ids.length) { Swal.fire({ icon:'warning', title:'กรุณาเลือกกรรมการอย่างน้อย 1 คน', confirmButtonColor:'#1e3a5f' }); return; }
+  showOverlay('กำลังบันทึก...');
+  const res = await apiCall('assignEvaluators', { periodId, teacherId, evaluatorIds: ids });
+  hideOverlay();
+  res.status === 'success'
+    ? Swal.fire({ icon:'success', title:'กำหนดกรรมการเรียบร้อย', timer:1500, showConfirmButton:false })
+    : Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:res.message, confirmButtonColor:'#1e3a5f' });
+}
+
+async function deletePeriod(id) {
+  const r = await Swal.fire({ icon:'warning', title:'ลบรอบประเมินนี้?',
+    showCancelButton:true, confirmButtonColor:'#dc2626',
+    cancelButtonColor:'#94a3b8', confirmButtonText:'ลบ', cancelButtonText:'ยกเลิก' });
+  if (!r.isConfirmed) return;
+  showOverlay('กำลังลบ...');
+  await apiCall('deleteEvalPeriod', { periodId: id });
+  allPeriods = allPeriods.filter(p => p.id !== id);
+  hideOverlay();
+  renderPeriodsList();
+  Swal.fire({ icon:'success', title:'ลบเรียบร้อย', timer:1200, showConfirmButton:false });
+}
+
+// ─── Score Modal ─────────────────────────────────────────────────
+function openScoreModal(periodId, teacherId, teacherName, level) {
+  document.getElementById('score-period-id').value   = periodId;
+  document.getElementById('score-teacher-id').value  = teacherId;
+  document.getElementById('score-teacher-name').textContent = teacherName;
+  document.getElementById('score-level-text').textContent   =
+    `วิทยฐานะ: ${level} | คะแนนเต็ม 100 คะแนน (80+10+10)`;
+  ['s-org1','s-org2','s-org3','s-comment'].forEach(id => document.getElementById(id).value='');
+  updateBar(1); updateBar(2); updateBar(3);
+  new bootstrap.Modal(document.getElementById('scoreModal')).show();
+}
+
+function updateBar(n) {
+  const max   = n===1 ? 80 : 10;
+  const val   = Math.min(parseFloat(document.getElementById('s-org'+n).value)||0, max);
+  const pct   = (val/max*100).toFixed(0);
+  document.getElementById('bar'+n).style.width = pct+'%';
+  document.getElementById('bar'+n+'-pct').textContent = val+'/'+max;
+  const t = (parseFloat(document.getElementById('s-org1').value)||0)
+          + (parseFloat(document.getElementById('s-org2').value)||0)
+          + (parseFloat(document.getElementById('s-org3').value)||0);
+  document.getElementById('total-score').textContent = Math.min(t,100).toFixed(1);
+}
+
+async function saveScore() {
+  const s = {
+    org1:    document.getElementById('s-org1').value,
+    org2:    document.getElementById('s-org2').value,
+    org3:    document.getElementById('s-org3').value,
+    comment: document.getElementById('s-comment').value
+  };
+  if (!s.org1 && !s.org2 && !s.org3)
+    return Swal.fire({ icon:'warning', title:'กรุณากรอกคะแนน', confirmButtonColor:'#1e3a5f' });
+
+  showOverlay('กำลังบันทึกคะแนน...');
+  const res = await apiCall('submitScore', {
+    periodId:    document.getElementById('score-period-id').value,
+    teacherId:   document.getElementById('score-teacher-id').value,
+    evaluatorId: CU.id,
+    scores: s
+  });
+  hideOverlay();
+  bootstrap.Modal.getInstance(document.getElementById('scoreModal'))?.hide();
+
+  if (res.status === 'success') {
+    Swal.fire({ icon:'success', title:'✅ บันทึกคะแนนแล้ว', text:res.message, timer:2000, showConfirmButton:false });
+    await loadData();
+    renderEvaluatorPane();
+  } else {
+    Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:res.message, confirmButtonColor:'#1e3a5f' });
+  }
+}
+
+// ─── File Upload ──────────────────────────────────────────────────
+function triggerFile(type, periodId) {
+  document.getElementById('file-'+type+'-'+periodId).click();
+}
+
+async function uploadFile(input, fileType, periodId) {
+  if (!input.files[0]) return;
+  const f = input.files[0];
+  if (f.type !== 'application/pdf')
+    return Swal.fire({ icon:'warning', title:'กรุณาเลือกไฟล์ PDF เท่านั้น', confirmButtonColor:'#1e3a5f' });
+
+  showOverlay('กำลังอัปโหลด '+f.name+'...');
+  try {
+    const b64 = await new Promise((res,rej) => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result.split(',')[1]);
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    });
+    const res = await apiCall('submitEvalFiles', {
+      periodId,
+      files: [{ fileType, name: f.name, type: f.type, content: b64 }]
+    });
+    hideOverlay();
+    if (res.status === 'success') {
+      Swal.fire({ icon:'success', title:'✅ อัปโหลดสำเร็จ', timer:1500, showConfirmButton:false });
+      await loadData();
+      renderTeacherPane();
+    } else {
+      Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:res.message, confirmButtonColor:'#1e3a5f' });
+    }
+  } catch(e) {
+    hideOverlay();
+    Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:e.message, confirmButtonColor:'#1e3a5f' });
+  }
+}
+
+// ─── Create Period ────────────────────────────────────────────────
+function toggleCreateForm() {
+  const el = document.getElementById('create-form-area');
+  const ic = document.getElementById('create-chevron');
+  el.classList.toggle('d-none');
+  ic.className = el.classList.contains('d-none') ? 'bi bi-chevron-down' : 'bi bi-chevron-up';
+}
+
+async function createPeriod() {
+  const name = document.getElementById('ep-name').value.trim();
+  if (!name) return Swal.fire({ icon:'warning', title:'กรุณาระบุชื่อรอบประเมิน', confirmButtonColor:'#1e3a5f' });
+  showOverlay('กำลังสร้างรอบประเมิน...');
+  const res = await apiCall('createEvalPeriod', { form: {
+    name, round: document.getElementById('ep-round').value,
+    year:  document.getElementById('ep-year').value,
+    startDate: document.getElementById('ep-start').value,
+    endDate:   document.getElementById('ep-end').value,
+    userId: CU.id
+  }});
+  hideOverlay();
+  if (res.status === 'success') {
+    Swal.fire({ icon:'success', title:'สร้างรอบประเมินแล้ว', timer:1500, showConfirmButton:false });
+    const periods = await apiCall('getEvalPeriods', {});
+    allPeriods = Array.isArray(periods) ? periods : [];
+    renderPeriodsList();
+    document.getElementById('create-form-area').classList.add('d-none');
+  } else {
+    Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:res.message, confirmButtonColor:'#1e3a5f' });
+  }
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────
+async function apiCall(action, params={}) {
+  const session = (() => { try { return JSON.parse(localStorage.getItem(APP_CONFIG.SESSION_KEY)); } catch{return null;} })();
+  const body = { action, ...params,
+    ...(session ? { sessionToken: session.sessionToken || session.token, userId: session.user?.id } : {}) };
+  const r = await fetch(APP_CONFIG.GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(body) });
+  return r.json();
+}
+
+function levelIdx(level) {
+  const m = {'ครูผู้ช่วย':0,'ยังไม่มีวิทยฐานะ':0,'ครูชำนาญการ':1,'ครูชำนาญการพิเศษ':2,'ครูเชี่ยวชาญ':3,'ครูเชี่ยวชาญพิเศษ':4};
+  return m[level] ?? 0;
+}
+
+function getLevelFromRole(role, position) {
+  if (!position) return 'ยังไม่มีวิทยฐานะ';
+  if (position.indexOf('ผู้ช่วย') >= 0) return 'ครูผู้ช่วย';
+  if (position.indexOf('เชี่ยวชาญพิเศษ') >= 0) return 'ครูเชี่ยวชาญพิเศษ';
+  if (position.indexOf('เชี่ยวชาญ') >= 0) return 'ครูเชี่ยวชาญ';
+  if (position.indexOf('ชำนาญการพิเศษ') >= 0) return 'ครูชำนาญการพิเศษ';
+  if (position.indexOf('ชำนาญการ') >= 0) return 'ครูชำนาญการ';
+  return 'ยังไม่มีวิทยฐานะ';
+}
+
+function showOverlay(t='') { document.getElementById('overlay-text').textContent=t; document.getElementById('overlay').style.display='flex'; }
+function hideOverlay() { document.getElementById('overlay').style.display='none'; }
+</script>
+</body>
+</html>
