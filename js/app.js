@@ -39,7 +39,8 @@ const app = (() => {
         { title: 'อนุมัติออกนอกโรงเรียน', sub: 'รายการขออนุญาตคงค้าง',      color: 'warning', icon: 'bi-door-open-fill',       fn: 'outperm.loadApprovals()' },
         { title: 'ตั้งค่ารักษาการ ผอ.',   sub: 'กำหนดผู้รักษาการแต่ละวัน',  color: 'secondary',icon: 'bi-person-badge-fill',   fn: 'acting.openModal()' },
         { title: 'งานวิจัยในชั้นเรียน',   sub: 'ดูและจัดการงานวิจัยทั้งหมด', color: 'info',   icon: 'bi-journal-bookmark-fill', fn: "window.open('research.html','_blank')" },
-        { title: 'จัดการการประเมิน',         sub: 'กำหนดรอบ / กรรมการ / สรุปผล', color: 'danger', icon: 'bi-clipboard2-check-fill',  fn: "window.open('evaluation.html','_blank')" }
+        { title: 'จัดการการประเมิน',         sub: 'กำหนดรอบ / กรรมการ / สรุปผล', color: 'danger', icon: 'bi-clipboard2-check-fill',  fn: "window.open('evaluation.html','_blank')" },
+        { title: 'บริหารโครงการ',             sub: 'จัดการโครงการและงบประมาณ',      color: 'dark',   icon: 'bi-kanban-fill',             fn: "window.open('projects.html','_blank')" }
       ],
       AcademicHead: [
         { title: 'รายการการลา',   sub: 'ดูการลาเพื่อจัดตารางสอนแทน', color: 'primary', icon: 'bi-calendar2-week-fill', fn: 'outperm.loadLeaveStats()' },
@@ -57,7 +58,8 @@ const app = (() => {
       { title: 'งานที่ได้รับมอบหมาย',    sub: 'ตรวจสอบและรายงานผล',           color: 'primary', icon: 'bi-person-workspace',     fn: 'docs.loadMyTasks()' },
       { title: 'ขออนุญาตออกนอกโรงเรียน', sub: 'บันทึกคำขอออกนอกสถานที่',     color: 'info',    icon: 'bi-door-open-fill',       fn: 'outperm.openSubmitModal()' },
       { title: 'ส่งงานวิจัยในชั้นเรียน', sub: 'อัปโหลดและติดตามงานวิจัย',    color: 'warning', icon: 'bi-journal-bookmark-fill', fn: "window.open('research.html','_blank')" },
-      { title: 'รายงานผลการปฏิบัติงาน',   sub: 'ส่งเอกสาร / SAR / รับคะแนน',  color: 'danger',  icon: 'bi-clipboard2-check-fill', fn: "window.open('evaluation.html','_blank')" }
+      { title: 'รายงานผลการปฏิบัติงาน',   sub: 'ส่งเอกสาร / SAR / รับคะแนน',  color: 'danger',  icon: 'bi-clipboard2-check-fill', fn: "window.open('evaluation.html','_blank')" },
+      { title: 'ระบบบริหารโครงการ',         sub: 'ติดตามโครงการและงบประมาณ',       color: 'secondary',icon: 'bi-kanban-fill',            fn: "window.open('projects.html','_blank')" }
     ];
 
     // Teacher ใช้ commonMenus เท่านั้น, Role อื่นๆ ใช้ roleMenus + commonMenus (ไม่ซ้ำ)

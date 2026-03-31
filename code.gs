@@ -91,6 +91,13 @@ function doPost(e) {
       case 'getResearchList':         res = getResearchList(body.filters); break;
       case 'deleteResearch':          res = deleteResearch(body.researchId, body.userId); break;
       case 'updateResearch':          res = updateResearch(body.researchId, body.form, body.userId); break;
+      // ── Project Management ──
+      case 'getProjects':          res = getProjects(body.filters); break;
+      case 'getProjectById':       res = getProjectById(body.id); break;
+      case 'saveProject':          res = saveProject(body.data); break;
+      case 'updateProject':        res = updateProject(body.data); break;
+      case 'deleteProject':        res = deleteProject(body.id); break;
+      case 'getProjectStats':      res = getProjectStats(); break;
       // ── Evaluation ──
       case 'getEvalPeriods':          res = getEvalPeriods(); break;
       case 'createEvalPeriod':        res = createEvalPeriod(body.form); break;
@@ -1172,7 +1179,6 @@ function submitResearch(form, fileDataArray) {
       var f = fileDataArray[0];
       var blob = Utilities.newBlob(Utilities.base64Decode(f.content), f.type, f.name);
       var driveFile = folder.createFile(blob);
-      driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
       fileUrl  = driveFile.getUrl();
       fileName = f.name;
     }
@@ -1387,12 +1393,9 @@ function assignEvaluators(periodId, teacherId, evaluatorIds) {
   evaluatorIds.forEach(function(eid) {
     var lid = getLineId(eid);
     if (lid) lineText(lid,
-      '📋 แจ้งการประเมินผลการปฏิบัติงาน
-'
-      +'คุณได้รับมอบหมายให้เป็นกรรมการประเมิน
-'
-      +'ครูที่ประเมิน: '+teacher.name+'
-'
+      '📋 แจ้งการประเมินผลการปฏิบัติงาน\n'
+      +'คุณได้รับมอบหมายให้เป็นกรรมการประเมิน\n'
+      +'ครูที่ประเมิน: '+teacher.name+'\n'
       +'กรุณาเข้าระบบเพื่อดำเนินการ');
   });
   return {status:'success', message:'กำหนดกรรมการเรียบร้อย'};
@@ -1418,7 +1421,6 @@ function submitEvalFiles(periodId, userId, files) {
       // upload
       var blob = Utilities.newBlob(Utilities.base64Decode(f.content), f.type, f.name);
       var driveFile = folder.createFile(blob);
-      driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
       var fid = 'EF-' + Utilities.getUuid().substring(0,8);
       sh.appendRow([fid, periodId, userId, f.fileType, driveFile.getUrl(), f.name, now]);
     });
@@ -1430,8 +1432,7 @@ function submitEvalFiles(periodId, userId, files) {
       if (aRows[i][1]!=periodId || aRows[i][2]!=userId) continue;
       var lid = getLineId(aRows[i][3]);
       if (lid) lineText(lid,
-        '📄 ครู'+teacher.name+' ส่งเอกสารประเมินแล้ว
-'
+        '📄 ครู'+teacher.name+' ส่งเอกสารประเมินแล้ว\n'
         +'กรุณาเข้าระบบเพื่อตรวจสอบและให้คะแนน');
     }
     // แจ้ง Director
@@ -1589,12 +1590,9 @@ function submitScore(periodId, teacherId, evaluatorId, scores) {
   var lid = getLineId(teacherId);
   var evInfo = getUserInfo(evaluatorId);
   if (lid) lineText(lid,
-    '✅ มีคะแนนประเมินใหม่
-'
-    +'ผู้ประเมิน: '+evInfo.name+'
-'
-    +'คะแนนรวม: '+total+'/100 คะแนน
-'
+    '✅ มีคะแนนประเมินใหม่\n'
+    +'ผู้ประเมิน: '+evInfo.name+'\n'
+    +'คะแนนรวม: '+total+'/100 คะแนน\n'
     +'กรุณาเข้าระบบเพื่อดูรายละเอียด');
 
   return {status:'success', message:'บันทึกคะแนนเรียบร้อย คะแนนรวม: '+total+'/100'};
@@ -1636,4 +1634,172 @@ function gradeFromScore(score) {
   if (score >= 70) return {label:'ดี', color:'info'};
   if (score >= 60) return {label:'พอใช้', color:'warning'};
   return {label:'ต้องปรับปรุง', color:'danger'};
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PROJECT MANAGEMENT — ระบบบริหารโครงการ
+//  Sheet "Projects": ProjectID | Name | Year | Department |
+//    Owner | Budget | UsedBudget | BudgetSource | Status |
+//    Objective | QuantTarget | QualTarget | Activities |
+//    Results | Issues | Summary | FileUrls | CreatedAt | UpdatedAt
+// ═══════════════════════════════════════════════════════════════
+
+var PROJECT_STATUS = {
+  NOT_STARTED: 'ยังไม่เริ่ม',
+  IN_PROGRESS:  'ดำเนินการ',
+  COMPLETED:    'เสร็จสิ้น',
+  CANCELLED:    'ยกเลิก'
+};
+
+function getProjectsSheet() {
+  var sh = ssheet().getSheetByName('Projects');
+  if (!sh) throw new Error('ไม่พบ Sheet Projects กรุณาสร้าง Sheet ก่อน');
+  return sh;
+}
+
+function getProjects(filters) {
+  try {
+    var sh   = getProjectsSheet();
+    var rows = sh.getDataRange().getValues();
+    if (rows.length <= 1) return [];
+    var hdrs = rows[0];
+    var out  = [];
+    for (var i = 1; i < rows.length; i++) {
+      var r = rows[i];
+      if (!r[0]) continue;
+      var p = {};
+      hdrs.forEach(function(h, j) {
+        p[h] = r[j] instanceof Date ? fmtDate(r[j]) : r[j];
+      });
+      if (filters) {
+        if (filters.department && filters.department !== 'ทั้งหมด' && p['Department'] !== filters.department) continue;
+        if (filters.status     && filters.status     !== 'ทั้งหมด' && p['Status']     !== filters.status)     continue;
+        if (filters.year       && filters.year       !== 'ทั้งหมด' && String(p['Year']) !== String(filters.year)) continue;
+        if (filters.search) {
+          var s = filters.search.toLowerCase();
+          if (String(p['Name']||'').toLowerCase().indexOf(s) < 0 &&
+              String(p['Owner']||'').toLowerCase().indexOf(s) < 0) continue;
+        }
+      }
+      out.push(p);
+    }
+    return out;
+  } catch(e) { return { status: 'error', message: e.toString() }; }
+}
+
+function getProjectById(id) {
+  try {
+    var sh   = getProjectsSheet();
+    var rows = sh.getDataRange().getValues();
+    var hdrs = rows[0];
+    for (var i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]) !== String(id)) continue;
+      var p = {};
+      hdrs.forEach(function(h, j) {
+        p[h] = rows[i][j] instanceof Date ? fmtDate(rows[i][j]) : rows[i][j];
+      });
+      return { status: 'success', project: p };
+    }
+    return { status: 'error', message: 'ไม่พบโครงการ' };
+  } catch(e) { return { status: 'error', message: e.toString() }; }
+}
+
+function saveProject(d) {
+  try {
+    var sh  = getProjectsSheet();
+    var tz  = Session.getScriptTimeZone();
+    var now = Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm');
+    var id  = 'PRJ-' + Utilities.formatDate(new Date(), tz, 'yyMMddHHmmss');
+    sh.appendRow([
+      id, d.Name||'', d.Year||'', d.Department||'', d.Owner||'',
+      Number(d.Budget)||0, Number(d.UsedBudget)||0, d.BudgetSource||'',
+      d.Status||PROJECT_STATUS.NOT_STARTED,
+      d.Objective||'', d.QuantTarget||'', d.QualTarget||'',
+      d.Activities||'', d.Results||'', d.Issues||'', d.Summary||'',
+      d.FileUrls||'', now, now
+    ]);
+    SpreadsheetApp.flush();
+    return { status: 'success', message: 'บันทึกโครงการเรียบร้อย', id: id };
+  } catch(e) { return { status: 'error', message: e.toString() }; }
+}
+
+function updateProject(d) {
+  try {
+    var sh   = getProjectsSheet();
+    var rows = sh.getDataRange().getValues();
+    var hdrs = rows[0];
+    var tz   = Session.getScriptTimeZone();
+    var now  = Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm');
+    for (var i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]) !== String(d.ProjectID)) continue;
+      var row = rows[i];
+      var upd = {
+        'Name':d.Name,'Year':d.Year,'Department':d.Department,'Owner':d.Owner,
+        'Budget':Number(d.Budget)||0,'UsedBudget':Number(d.UsedBudget)||0,
+        'BudgetSource':d.BudgetSource,'Status':d.Status,
+        'Objective':d.Objective,'QuantTarget':d.QuantTarget,'QualTarget':d.QualTarget,
+        'Activities':d.Activities,'Results':d.Results,'Issues':d.Issues,
+        'Summary':d.Summary,'FileUrls':d.FileUrls,'UpdatedAt':now
+      };
+      hdrs.forEach(function(h, j) { if (upd[h] !== undefined) row[j] = upd[h]; });
+      sh.getRange(i+1, 1, 1, row.length).setValues([row]);
+      SpreadsheetApp.flush();
+      return { status: 'success', message: 'อัปเดตโครงการเรียบร้อย' };
+    }
+    return { status: 'error', message: 'ไม่พบโครงการ' };
+  } catch(e) { return { status: 'error', message: e.toString() }; }
+}
+
+function deleteProject(id) {
+  try {
+    var sh   = getProjectsSheet();
+    var rows = sh.getDataRange().getValues();
+    for (var i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]) === String(id)) {
+        sh.deleteRow(i + 1);
+        SpreadsheetApp.flush();
+        return { status: 'success', message: 'ลบโครงการเรียบร้อย' };
+      }
+    }
+    return { status: 'error', message: 'ไม่พบโครงการ' };
+  } catch(e) { return { status: 'error', message: e.toString() }; }
+}
+
+function getProjectStats() {
+  try {
+    var sh   = getProjectsSheet();
+    var rows = sh.getDataRange().getValues();
+    if (rows.length <= 1) return { status:'success', stats:{total:0,inProgress:0,completed:0,notStarted:0,cancelled:0,totalBudget:0,usedBudget:0}, byDept:{} };
+    var hdrs = rows[0];
+    var idx  = {};
+    hdrs.forEach(function(h, i) { idx[h] = i; });
+
+    var stats = { total:0, inProgress:0, completed:0, notStarted:0, cancelled:0, totalBudget:0, usedBudget:0 };
+    var byDept = {}, recent = [];
+
+    for (var i = 1; i < rows.length; i++) {
+      var r = rows[i];
+      if (!r[0]) continue;
+      stats.total++;
+      var status = r[idx['Status']]  || '';
+      var budget = Number(r[idx['Budget']])    || 0;
+      var used   = Number(r[idx['UsedBudget']]) || 0;
+      var dept   = r[idx['Department']] || '';
+      if (status === PROJECT_STATUS.IN_PROGRESS)  stats.inProgress++;
+      else if (status === PROJECT_STATUS.COMPLETED) stats.completed++;
+      else if (status === PROJECT_STATUS.NOT_STARTED) stats.notStarted++;
+      else stats.cancelled++;
+      stats.totalBudget += budget;
+      stats.usedBudget  += used;
+      if (!byDept[dept]) byDept[dept] = { budget:0, count:0 };
+      byDept[dept].budget += budget;
+      byDept[dept].count++;
+      if (recent.length < 5) recent.push({
+        id:r[idx['ProjectID']], name:r[idx['Name']],
+        owner:r[idx['Owner']], status:status, budget:budget, dept:dept
+      });
+    }
+    stats.remainingBudget = stats.totalBudget - stats.usedBudget;
+    return { status:'success', stats:stats, byDept:byDept, recent:recent };
+  } catch(e) { return { status:'error', message:e.toString() }; }
 }
