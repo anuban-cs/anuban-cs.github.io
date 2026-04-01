@@ -11,99 +11,82 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="config.js"></script>
 <style>
-:root{
-  --p:#7c3aed;--p2:#6d28d9;--s:#ec4899;
-  --sky:#ede9fe;--yellow:#fef3c7;
-  --green:#059669;--red:#dc2626;--orange:#d97706;
-  --gray:#f8fafc;--border:#e2e8f0;
-  --radius:14px;--shadow:0 2px 16px rgba(124,58,237,.10);
-}
+:root{--p:#7c3aed;--p2:#4c1d95;--s:#ec4899;--sky:#ede9fe;--border:#ddd6fe;
+  --radius:14px;--shadow:0 2px 16px rgba(124,58,237,.10)}
 *{font-family:'Sarabun',sans-serif}
-h1,h2,h3,h4,h5,h6,.heading{font-family:'Kanit',sans-serif}
-body{background:linear-gradient(135deg,#ede9fe 0%,#fce7f3 50%,#ede9fe 100%);min-height:100vh;color:#1e1b4b}
+.heading{font-family:'Kanit',sans-serif}
+body{background:linear-gradient(135deg,#ede9fe 0%,#fce7f3 50%,#ede9fe 100%);min-height:100vh}
 
-/* Header */
-.page-header{background:linear-gradient(135deg,#4c1d95,var(--p),#7c3aed);
-  padding:24px 0;box-shadow:0 4px 24px rgba(124,58,237,.3)}
-.page-header h1{font-size:1.3rem;color:#fff;font-weight:600;margin:0}
-.page-header p{color:rgba(255,255,255,.75);font-size:.82rem;margin:2px 0 0}
-.school-logo{width:52px;height:52px;border-radius:50%;object-fit:cover;
-  border:2.5px solid rgba(255,255,255,.5)}
+.page-header{background:linear-gradient(135deg,#4c1d95,#7c3aed);padding:22px 0;
+  box-shadow:0 4px 24px rgba(124,58,237,.3)}
+.page-header h1{font-size:1.25rem;color:#fff;font-weight:600;margin:0;font-family:'Kanit',sans-serif}
+.page-header p{color:rgba(255,255,255,.75);font-size:.8rem;margin:2px 0 0}
+.school-logo{width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.5)}
 
-/* Stats */
-.stat-card{background:#fff;border-radius:var(--radius);padding:20px;
-  border:1.5px solid rgba(124,58,237,.15);box-shadow:var(--shadow);
-  transition:transform .2s}
-.stat-card:hover{transform:translateY(-3px)}
-.stat-num{font-family:'Kanit',sans-serif;font-size:2rem;font-weight:700}
-.stat-label{font-size:.8rem;color:#64748b;margin-top:2px}
+.stat-card{background:#fff;border-radius:var(--radius);padding:18px;
+  border:1.5px solid var(--border);box-shadow:var(--shadow);transition:transform .2s}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-num{font-family:'Kanit',sans-serif;font-size:1.9rem;font-weight:700}
 
-/* Card */
-.proj-card{background:#fff;border-radius:var(--radius);
-  border:1.5px solid var(--border);box-shadow:var(--shadow);
-  transition:all .2s;cursor:pointer}
-.proj-card:hover{border-color:var(--p);box-shadow:0 4px 24px rgba(124,58,237,.18);
-  transform:translateY(-2px)}
+.filter-bar{background:rgba(255,255,255,.9);backdrop-filter:blur(8px);
+  border-radius:var(--radius);padding:14px 20px;border:1.5px solid rgba(221,214,254,.6)}
 
-/* Status Badge */
-.status-badge{display:inline-block;padding:3px 12px;border-radius:20px;
-  font-size:.75rem;font-weight:700;white-space:nowrap}
-.st-ยังไม่เริ่ม{background:#e0e7ff;color:#3730a3}
-.st-ดำเนินการ{background:#fef3c7;color:#92400e}
-.st-เสร็จสิ้น{background:#d1fae5;color:#065f46}
-.st-ยกเลิก{background:#fee2e2;color:#991b1b}
-
-/* Dept Badge */
-.dept-badge{display:inline-block;padding:2px 10px;border-radius:20px;
-  font-size:.73rem;font-weight:600;background:var(--sky);color:var(--p)}
-
-/* Budget Bar */
-.budget-bar{height:8px;border-radius:20px;background:#e9d5ff;margin-top:6px}
-.budget-fill{height:100%;border-radius:20px;
-  background:linear-gradient(90deg,var(--p),var(--s));transition:width .6s}
-
-/* Form */
-.form-label{font-weight:500;font-size:.88rem;color:#4c1d95;margin-bottom:3px}
-.form-control,.form-select{border:1.5px solid #ddd6fe;border-radius:10px;
+.form-label{font-weight:600;font-size:.87rem;color:var(--p2);margin-bottom:3px}
+.form-control,.form-select{border:1.5px solid var(--border);border-radius:10px;
   background:#faf5ff;font-size:.9rem}
 .form-control:focus,.form-select:focus{border-color:var(--p);
   box-shadow:0 0 0 3px rgba(124,58,237,.12);background:#fff}
-.section-title{font-family:'Kanit',sans-serif;font-size:.78rem;font-weight:600;
-  letter-spacing:.06em;text-transform:uppercase;color:var(--p);
-  margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #ddd6fe}
+.sec-title{font-family:'Kanit',sans-serif;font-size:.78rem;font-weight:600;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--p);
+  padding-bottom:6px;border-bottom:2px solid var(--border);margin-bottom:14px}
 
-/* Table */
-.proj-table thead th{background:linear-gradient(135deg,#4c1d95,var(--p));
-  color:#fff;font-family:'Kanit',sans-serif;font-size:.82rem;
-  padding:12px 14px;border:none;white-space:nowrap}
-.proj-table td{vertical-align:middle;font-size:.87rem;border-color:#ede9fe}
+/* Budget items table */
+.budget-table th{background:var(--sky);color:var(--p2);font-size:.82rem;font-weight:700;padding:8px 10px}
+.budget-table td{padding:6px 10px;font-size:.87rem;vertical-align:middle}
+.budget-total{background:#f5f3ff;font-weight:700;color:var(--p)}
+
+/* Status badges */
+.status-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.74rem;font-weight:700}
+.st-ร่าง{background:#f1f5f9;color:#475569}
+.st-รออนุมัติ{background:#fef3c7;color:#92400e}
+.st-อนุมัติแล้ว{background:#d1fae5;color:#065f46}
+.st-ดำเนินการ{background:#dbeafe;color:#1e40af}
+.st-เสร็จสิ้น{background:#d1fae5;color:#065f46}
+.st-ยกเลิก{background:#fee2e2;color:#991b1b}
+
+.proj-table thead th{background:linear-gradient(135deg,#4c1d95,#7c3aed);
+  color:#fff;font-family:'Kanit',sans-serif;font-size:.82rem;padding:11px 13px;border:none;white-space:nowrap}
+.proj-table td{vertical-align:middle;font-size:.86rem;border-color:#ede9fe}
 .proj-table tr:hover td{background:#faf5ff}
 
-/* Overlay */
 .overlay{display:none;position:fixed;inset:0;background:rgba(76,29,149,.15);
   backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-.spin{width:50px;height:50px;border:5px solid rgba(124,58,237,.2);
+.spin{width:48px;height:48px;border:5px solid rgba(124,58,237,.2);
   border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Tabs */
-.nav-pills .nav-link{color:#4c1d95;font-weight:500;border-radius:8px;padding:8px 18px}
-.nav-pills .nav-link.active{background:var(--p);color:#fff}
+.budget-bar{height:7px;border-radius:20px;background:#e9d5ff;margin-top:5px}
+.budget-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--p),var(--s));transition:width .5s}
 
-/* Filter bar */
-.filter-bar{background:rgba(255,255,255,.85);backdrop-filter:blur(8px);
-  border-radius:var(--radius);padding:14px 20px;border:1.5px solid rgba(221,214,254,.6);
-  box-shadow:var(--shadow)}
+/* View detail sections */
+.detail-sec{background:#faf5ff;border-radius:10px;padding:14px;margin-bottom:12px}
+.detail-sec h6{font-family:'Kanit',sans-serif;color:var(--p);font-size:.82rem;
+  font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.detail-sec p{font-size:.88rem;line-height:1.7;color:#1e1b4b;margin:0;white-space:pre-wrap}
+
+.pdca-table td,.pdca-table th{padding:7px 10px;font-size:.84rem}
+.pdca-table th{background:var(--sky);color:var(--p2);font-weight:700}
+
+.eval-table td,.eval-table th{padding:7px 10px;font-size:.83rem;vertical-align:top}
+.eval-table th{background:var(--sky);color:var(--p2);font-weight:700}
 </style>
 </head>
 <body>
-
 <div class="overlay" id="overlay">
   <div class="spin"></div>
   <p style="color:#4c1d95;font-weight:600;font-family:'Kanit',sans-serif" id="overlay-text">กำลังดำเนินการ...</p>
 </div>
 
-<!-- Header -->
 <div class="page-header">
   <div class="container">
     <div class="d-flex align-items-center justify-content-between">
@@ -114,7 +97,7 @@ body{background:linear-gradient(135deg,#ede9fe 0%,#fce7f3 50%,#ede9fe 100%);min-
           <p>โรงเรียนอนุบาลชุมแสง (วัดทับกฤชกลาง)</p>
         </div>
       </div>
-      <a href="index.html" style="color:rgba(255,255,255,.8);text-decoration:none;font-size:.85rem">
+      <a href="index.html" style="color:rgba(255,255,255,.8);text-decoration:none;font-size:.83rem">
         <i class="bi bi-arrow-left-circle me-1"></i>กลับสู่ระบบหลัก
       </a>
     </div>
@@ -123,222 +106,302 @@ body{background:linear-gradient(135deg,#ede9fe 0%,#fce7f3 50%,#ede9fe 100%);min-
 
 <div class="container py-4 pb-5">
 
-  <!-- Stats Row -->
-  <div class="row g-3 mb-4" id="stats-row">
-    <div class="col-6 col-md-3">
+  <!-- Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-2">
       <div class="stat-card text-center">
         <div class="stat-num" style="color:var(--p)" id="s-total">0</div>
-        <div class="stat-label"><i class="bi bi-folder2-open me-1"></i>โครงการทั้งหมด</div>
+        <div style="font-size:.75rem;color:#64748b">ทั้งหมด</div>
       </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-2">
       <div class="stat-card text-center">
-        <div class="stat-num" style="color:var(--orange)" id="s-inprogress">0</div>
-        <div class="stat-label"><i class="bi bi-play-circle me-1"></i>กำลังดำเนินการ</div>
+        <div class="stat-num" style="color:#d97706" id="s-pending">0</div>
+        <div style="font-size:.75rem;color:#64748b">รออนุมัติ</div>
       </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-2">
       <div class="stat-card text-center">
-        <div class="stat-num" style="color:var(--green)" id="s-completed">0</div>
-        <div class="stat-label"><i class="bi bi-check-circle me-1"></i>เสร็จสิ้น</div>
+        <div class="stat-num" style="color:#059669" id="s-approved">0</div>
+        <div style="font-size:.75rem;color:#64748b">อนุมัติแล้ว</div>
       </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-2">
       <div class="stat-card text-center">
-        <div class="stat-num" style="color:var(--s)" id="s-budget">0</div>
-        <div class="stat-label"><i class="bi bi-currency-exchange me-1"></i>งบรวม (บาท)</div>
+        <div class="stat-num" style="color:#2563eb" id="s-inprogress">0</div>
+        <div style="font-size:.75rem;color:#64748b">ดำเนินการ</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="stat-card text-center">
+        <div class="stat-num" style="color:#059669" id="s-completed">0</div>
+        <div style="font-size:.75rem;color:#64748b">เสร็จสิ้น</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="stat-card text-center">
+        <div class="stat-num" style="color:var(--s)" id="s-budget" style="font-size:1.3rem">0</div>
+        <div style="font-size:.75rem;color:#64748b">งบรวม (บ.)</div>
       </div>
     </div>
   </div>
 
-  <!-- Tabs -->
-  <ul class="nav nav-pills mb-4 gap-1">
-    <li class="nav-item">
-      <a class="nav-link active" href="#" onclick="showTab('list',this)">
-        <i class="bi bi-list-ul me-1"></i>รายการโครงการ
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#" onclick="showTab('dept',this)">
-        <i class="bi bi-pie-chart-fill me-1"></i>จำแนกตามฝ่าย
-      </a>
-    </li>
-  </ul>
-
-  <!-- TAB: รายการโครงการ -->
-  <div id="pane-list">
-
-    <!-- Filter & Add -->
-    <div class="filter-bar mb-4">
-      <div class="row g-2 align-items-end">
-        <div class="col-md-3">
-          <label class="form-label small fw-bold">ค้นหา</label>
-          <input type="text" class="form-control form-control-sm" id="f-search"
-            placeholder="ชื่อโครงการ / ผู้รับผิดชอบ..." oninput="filterProjects()">
-        </div>
-        <div class="col-md-2">
-          <label class="form-label small fw-bold">ฝ่ายงาน</label>
-          <select class="form-select form-select-sm" id="f-dept" onchange="filterProjects()">
-            <option value="ทั้งหมด">ทั้งหมด</option>
-            <option>วิชาการ</option>
-            <option>บริหารทั่วไป</option>
-            <option>บุคคล</option>
-            <option>งบประมาณ</option>
-            <option>กิจการนักเรียน</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <label class="form-label small fw-bold">สถานะ</label>
-          <select class="form-select form-select-sm" id="f-status" onchange="filterProjects()">
-            <option value="ทั้งหมด">ทั้งหมด</option>
-            <option>ยังไม่เริ่ม</option>
-            <option>ดำเนินการ</option>
-            <option>เสร็จสิ้น</option>
-            <option>ยกเลิก</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <label class="form-label small fw-bold">ปีการศึกษา</label>
-          <select class="form-select form-select-sm" id="f-year" onchange="filterProjects()">
-            <option value="ทั้งหมด">ทั้งหมด</option>
-          </select>
-        </div>
-        <div class="col-md-3 d-flex gap-2 justify-content-end">
-          <span class="badge align-self-end mb-1 px-3 py-2 fs-6"
-            style="background:var(--sky);color:var(--p)" id="result-count">0 โครงการ</span>
-          <button class="btn btn-sm" style="background:var(--p);color:#fff;border-radius:20px"
-            onclick="openAddModal()" id="btn-add">
-            <i class="bi bi-plus-circle-fill me-1"></i>เพิ่มโครงการ
-          </button>
-        </div>
+  <!-- Filter + Add -->
+  <div class="filter-bar mb-3">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small fw-bold">ค้นหา</label>
+        <input type="text" class="form-control form-control-sm" id="f-search"
+          placeholder="ชื่อโครงการ / ผู้รับผิดชอบ..." oninput="filterProjects()">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small fw-bold">ฝ่ายงาน</label>
+        <select class="form-select form-select-sm" id="f-dept" onchange="filterProjects()">
+          <option value="ทั้งหมด">ทั้งหมด</option>
+          <option>วิชาการ</option><option>บริหารทั่วไป</option>
+          <option>บุคคล</option><option>งบประมาณ</option><option>กิจการนักเรียน</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small fw-bold">สถานะ</label>
+        <select class="form-select form-select-sm" id="f-status" onchange="filterProjects()">
+          <option value="ทั้งหมด">ทั้งหมด</option>
+          <option>ร่าง</option><option>รออนุมัติ</option><option>อนุมัติแล้ว</option>
+          <option>ดำเนินการ</option><option>เสร็จสิ้น</option><option>ยกเลิก</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small fw-bold">ปีการศึกษา</label>
+        <select class="form-select form-select-sm" id="f-year" onchange="filterProjects()">
+          <option value="ทั้งหมด">ทั้งหมด</option>
+        </select>
+      </div>
+      <div class="col-md-3 d-flex gap-2 justify-content-end align-items-end">
+        <span class="badge px-3 py-2" style="background:var(--sky);color:var(--p);font-size:.82rem"
+          id="result-count">0 โครงการ</span>
+        <button class="btn btn-sm" style="background:var(--p);color:#fff;border-radius:20px"
+          onclick="openAddModal()" id="btn-add">
+          <i class="bi bi-plus-circle-fill me-1"></i>เพิ่มโครงการ
+        </button>
       </div>
     </div>
+  </div>
 
-    <!-- Table -->
-    <div class="card" style="border-radius:var(--radius);border:1.5px solid #ddd6fe;overflow:hidden">
-      <div class="table-responsive">
-        <table class="table proj-table mb-0" id="projTable">
-          <thead><tr>
-            <th>#</th><th>ชื่อโครงการ</th><th>ปี</th><th>ฝ่ายงาน</th>
-            <th>ผู้รับผิดชอบ</th><th>งบจัดสรร</th><th>งบใช้จริง</th>
-            <th>สถานะ</th><th>จัดการ</th>
-          </tr></thead>
-          <tbody id="projBody">
-            <tr><td colspan="9" class="text-center py-5 text-muted">
-              กำลังโหลด...
-            </td></tr>
-          </tbody>
-        </table>
-      </div>
+  <!-- Table -->
+  <div style="background:#fff;border-radius:var(--radius);border:1.5px solid var(--border);overflow:hidden">
+    <div class="table-responsive">
+      <table class="table proj-table mb-0">
+        <thead><tr>
+          <th>#</th><th>ชื่อโครงการ</th><th>ปี</th><th>ฝ่าย</th>
+          <th>ผู้รับผิดชอบ</th><th class="text-end">งบจัดสรร</th>
+          <th class="text-end">งบใช้จริง</th><th>สถานะ</th><th>จัดการ</th>
+        </tr></thead>
+        <tbody id="projBody">
+          <tr><td colspan="9" class="text-center py-5 text-muted">กำลังโหลด...</td></tr>
+        </tbody>
+      </table>
     </div>
-
   </div>
-
-  <!-- TAB: จำแนกตามฝ่าย -->
-  <div id="pane-dept" class="d-none">
-    <div class="row g-3" id="dept-cards"></div>
-  </div>
-
 </div>
 
-<!-- Add/Edit Modal -->
+<!-- ══ ADD/EDIT MODAL ══════════════════════════════════════════ -->
 <div class="modal fade" id="projModal" tabindex="-1" data-bs-backdrop="static">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content" style="border-radius:18px;border:2px solid #ddd6fe">
+    <div class="modal-content" style="border-radius:18px;border:2px solid var(--border)">
       <div class="modal-header" style="background:linear-gradient(135deg,#4c1d95,var(--p));border-radius:16px 16px 0 0">
-        <h5 class="modal-title text-white heading">
-          <i class="bi bi-folder-plus me-2"></i>
-          <span id="modal-title-text">เพิ่มโครงการใหม่</span>
-        </h5>
+        <div>
+          <h5 class="modal-title text-white heading" id="modal-title-text">แบบเสนอโครงการ</h5>
+          <small class="text-white opacity-75">โรงเรียนอนุบาลชุมแสง (วัดทับกฤชกลาง)</small>
+        </div>
         <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-4">
         <input type="hidden" id="proj-id">
 
         <!-- ส่วนที่ 1: ข้อมูลทั่วไป -->
-        <p class="section-title"><i class="bi bi-info-circle me-1"></i>ข้อมูลทั่วไป</p>
+        <p class="sec-title"><i class="bi bi-info-circle-fill me-1"></i>ส่วนที่ 1 — ข้อมูลทั่วไป</p>
         <div class="row g-3 mb-4">
           <div class="col-12">
             <label class="form-label">ชื่อโครงการ <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="p-name" required>
+            <input class="form-control" id="p-name" placeholder="ระบุชื่อโครงการ" required>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-label">ปีการศึกษา</label>
-            <input type="text" class="form-control" id="p-year" placeholder="2568">
+            <input class="form-control" id="p-year" placeholder="2568">
           </div>
-          <div class="col-md-4">
-            <label class="form-label">ฝ่ายงาน</label>
+          <div class="col-md-3">
+            <label class="form-label">กลุ่มบริหารงาน / ฝ่ายงาน</label>
             <select class="form-select" id="p-dept">
-              <option>วิชาการ</option>
-              <option>บริหารทั่วไป</option>
-              <option>บุคคล</option>
-              <option>งบประมาณ</option>
-              <option>กิจการนักเรียน</option>
+              <option>วิชาการ</option><option>บริหารทั่วไป</option>
+              <option>บุคคล</option><option>งบประมาณ</option><option>กิจการนักเรียน</option>
             </select>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
+            <label class="form-label">ลักษณะโครงการ</label>
+            <select class="form-select" id="p-type">
+              <option>โครงการใหม่</option><option>โครงการต่อเนื่อง</option>
+            </select>
+          </div>
+          <div class="col-md-3">
             <label class="form-label">ผู้รับผิดชอบ</label>
-            <input type="text" class="form-control" id="p-owner">
-          </div>
-        </div>
-
-        <!-- ส่วนที่ 2: งบประมาณ -->
-        <p class="section-title"><i class="bi bi-currency-exchange me-1"></i>งบประมาณ</p>
-        <div class="row g-3 mb-4">
-          <div class="col-md-4">
-            <label class="form-label">งบที่ได้รับจัดสรร (บาท)</label>
-            <input type="number" class="form-control" id="p-budget" min="0" step="100">
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">งบที่ใช้จริง (บาท)</label>
-            <input type="number" class="form-control" id="p-used" min="0" step="100">
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">แหล่งงบประมาณ</label>
-            <input type="text" class="form-control" id="p-source" placeholder="เช่น งบดำเนินงาน">
-          </div>
-        </div>
-
-        <!-- ส่วนที่ 3: รายละเอียด -->
-        <p class="section-title"><i class="bi bi-file-text me-1"></i>รายละเอียดโครงการ</p>
-        <div class="row g-3 mb-4">
-          <div class="col-12">
-            <label class="form-label">วัตถุประสงค์</label>
-            <textarea class="form-control" id="p-obj" rows="2"></textarea>
+            <input class="form-control" id="p-owner" placeholder="ชื่อผู้รับผิดชอบ">
           </div>
           <div class="col-md-6">
-            <label class="form-label">เป้าหมายเชิงปริมาณ</label>
-            <textarea class="form-control" id="p-quant" rows="2"></textarea>
+            <label class="form-label">สนองกลยุทธ์ของโรงเรียน ข้อที่</label>
+            <input class="form-control" id="p-strategy" placeholder="เช่น 1, 2, 3">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">สถานที่ดำเนินการ</label>
+            <input class="form-control" id="p-location" placeholder="สถานที่">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">ระยะเวลาดำเนินการ</label>
+            <select class="form-select" id="p-period">
+              <option>ภาคเรียนที่ 1</option><option>ภาคเรียนที่ 2</option>
+              <option>ตลอดปีการศึกษา</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">หน่วยงานที่เกี่ยวข้อง</label>
+            <input class="form-control" id="p-agency" placeholder="หน่วยงานที่เกี่ยวข้อง">
+          </div>
+          <div class="col-12">
+            <label class="form-label">สนองมาตรฐานการศึกษา</label>
+            <textarea class="form-control" id="p-standard" rows="2"
+              placeholder="มาตรฐานที่ / ตัวบ่งชี้ย่อย..."></textarea>
+          </div>
+        </div>
+
+        <!-- ส่วนที่ 2: รายละเอียดโครงการ -->
+        <p class="sec-title"><i class="bi bi-file-text-fill me-1"></i>ส่วนที่ 2 — รายละเอียดโครงการ</p>
+        <div class="row g-3 mb-4">
+          <div class="col-12">
+            <label class="form-label">1. หลักการและเหตุผล</label>
+            <textarea class="form-control" id="p-principle" rows="4"
+              placeholder="อธิบายหลักการและเหตุผลของโครงการ"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">2. วัตถุประสงค์</label>
+            <textarea class="form-control" id="p-objective" rows="3"
+              placeholder="1. เพื่อ...&#10;2. เพื่อ..."></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">3. เป้าหมายเชิงปริมาณ</label>
+            <textarea class="form-control" id="p-quant" rows="3"
+              placeholder="จำนวน / ร้อยละ ที่ต้องการ..."></textarea>
           </div>
           <div class="col-md-6">
             <label class="form-label">เป้าหมายเชิงคุณภาพ</label>
-            <textarea class="form-control" id="p-qual" rows="2"></textarea>
+            <textarea class="form-control" id="p-qual" rows="3"
+              placeholder="คุณภาพที่ต้องการ..."></textarea>
           </div>
         </div>
 
-        <!-- ส่วนที่ 4: ผลการดำเนินงาน -->
-        <p class="section-title"><i class="bi bi-clipboard2-check me-1"></i>ผลการดำเนินงาน</p>
+        <!-- วิธีการดำเนินการ PDCA -->
+        <p class="sec-title"><i class="bi bi-diagram-3-fill me-1"></i>6. วิธีการดำเนินการ (PDCA)</p>
+        <div class="mb-4">
+          <div class="table-responsive">
+            <table class="table table-bordered budget-table" id="pdca-table">
+              <thead><tr>
+                <th style="width:5%">ที่</th>
+                <th>กิจกรรม / ขั้นตอนการดำเนินงาน</th>
+                <th style="width:20%">ระยะเวลา</th>
+                <th style="width:25%">ผู้รับผิดชอบ</th>
+                <th style="width:5%"></th>
+              </tr></thead>
+              <tbody id="pdca-body">
+                <tr>
+                  <td class="text-center">1</td>
+                  <td><input class="form-control form-control-sm" placeholder="ขั้นวางแผน (Plan): ..."></td>
+                  <td><input class="form-control form-control-sm" placeholder="ระยะเวลา"></td>
+                  <td><input class="form-control form-control-sm" placeholder="ผู้รับผิดชอบ"></td>
+                  <td><button class="btn btn-sm btn-outline-danger" onclick="removePdcaRow(this)">×</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <button class="btn btn-sm" style="background:var(--sky);color:var(--p);border:1.5px solid var(--border)"
+            onclick="addPdcaRow()">
+            <i class="bi bi-plus-circle me-1"></i>เพิ่มขั้นตอน
+          </button>
+        </div>
+
+        <!-- ส่วนที่ 3: งบประมาณ -->
+        <p class="sec-title"><i class="bi bi-cash-stack me-1"></i>ส่วนที่ 3 — งบประมาณ</p>
         <div class="row g-3 mb-4">
           <div class="col-md-4">
-            <label class="form-label">สถานะ</label>
-            <select class="form-select" id="p-status">
-              <option>ยังไม่เริ่ม</option>
-              <option>ดำเนินการ</option>
-              <option>เสร็จสิ้น</option>
-              <option>ยกเลิก</option>
-            </select>
+            <label class="form-label">แหล่งงบประมาณ</label>
+            <input class="form-control" id="p-source" placeholder="เช่น เงินรายได้สถานศึกษา">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">งบประมาณที่ได้รับจัดสรร (บาท)</label>
+            <input type="number" class="form-control" id="p-budget" min="0" step="0.01"
+              oninput="updateBudgetTotal()">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">งบประมาณที่ใช้จริง (บาท)</label>
+            <input type="number" class="form-control" id="p-used" min="0" step="0.01">
+          </div>
+        </div>
+
+        <!-- รายการค่าใช้จ่าย -->
+        <div class="mb-4">
+          <label class="form-label fw-bold">รายละเอียดงบประมาณ</label>
+          <div class="table-responsive">
+            <table class="table table-bordered budget-table">
+              <thead><tr>
+                <th style="width:5%">ที่</th>
+                <th>รายการ</th>
+                <th style="width:12%">จำนวน</th>
+                <th style="width:18%">ราคาต่อหน่วย</th>
+                <th style="width:18%">รวมเงิน</th>
+                <th style="width:5%"></th>
+              </tr></thead>
+              <tbody id="budget-body">
+                <tr>
+                  <td class="text-center">1</td>
+                  <td><input class="form-control form-control-sm" placeholder="รายการค่าใช้จ่าย"></td>
+                  <td><input type="number" class="form-control form-control-sm budget-qty" min="1" value="1" oninput="calcRow(this)"></td>
+                  <td><input type="number" class="form-control form-control-sm budget-price" min="0" step="0.01" oninput="calcRow(this)"></td>
+                  <td><input type="number" class="form-control form-control-sm budget-total" readonly style="background:#f5f3ff;font-weight:700"></td>
+                  <td><button class="btn btn-sm btn-outline-danger" onclick="removeBudgetRow(this)">×</button></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="budget-total">
+                  <td colspan="4" class="text-end fw-bold">รวมเป็นเงินทั้งสิ้น</td>
+                  <td><input type="number" id="budget-grand-total" class="form-control form-control-sm" readonly style="background:#ede9fe;font-weight:700;color:var(--p)"></td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <button class="btn btn-sm" style="background:var(--sky);color:var(--p);border:1.5px solid var(--border)"
+            onclick="addBudgetRow()">
+            <i class="bi bi-plus-circle me-1"></i>เพิ่มรายการ
+          </button>
+        </div>
+
+        <!-- ส่วนที่ 4: การติดตามและผลลัพธ์ -->
+        <p class="sec-title"><i class="bi bi-clipboard2-check-fill me-1"></i>ส่วนที่ 4 — การติดตามและผลลัพธ์</p>
+        <div class="row g-3 mb-4">
+          <div class="col-12">
+            <label class="form-label">การติดตามประเมินผล (ตัวชี้วัด / วิธีวัด / เครื่องมือ)</label>
+            <textarea class="form-control" id="p-eval" rows="3"
+              placeholder="ตัวชี้วัดความสำเร็จ..."></textarea>
           </div>
           <div class="col-12">
-            <label class="form-label">กิจกรรมที่ดำเนินการ</label>
-            <textarea class="form-control" id="p-activities" rows="2"></textarea>
+            <label class="form-label">ผลที่คาดว่าจะได้รับ</label>
+            <textarea class="form-control" id="p-expected" rows="3"
+              placeholder="1. ด้านผลสัมฤทธิ์...&#10;2. ด้านคุณภาพ..."></textarea>
           </div>
           <div class="col-md-6">
-            <label class="form-label">ผลการดำเนินงาน</label>
-            <textarea class="form-control" id="p-results" rows="2"></textarea>
+            <label class="form-label">ผลการดำเนินงาน <span class="text-muted small">(กรอกหลังดำเนินการ)</span></label>
+            <textarea class="form-control" id="p-results" rows="3"></textarea>
           </div>
           <div class="col-md-6">
-            <label class="form-label">ปัญหาและข้อเสนอแนะ</label>
-            <textarea class="form-control" id="p-issues" rows="2"></textarea>
+            <label class="form-label">ปัญหา / ข้อเสนอแนะ</label>
+            <textarea class="form-control" id="p-issues" rows="3"></textarea>
           </div>
           <div class="col-12">
             <label class="form-label">สรุปโครงการ</label>
@@ -346,9 +409,23 @@ body{background:linear-gradient(135deg,#ede9fe 0%,#fce7f3 50%,#ede9fe 100%);min-
           </div>
         </div>
 
+        <!-- สถานะ -->
+        <p class="sec-title"><i class="bi bi-flag-fill me-1"></i>สถานะโครงการ</p>
+        <div class="col-md-4">
+          <label class="form-label">สถานะ</label>
+          <select class="form-select" id="p-status">
+            <option value="ร่าง">ร่าง</option>
+            <option value="รออนุมัติ">รออนุมัติ</option>
+            <option value="อนุมัติแล้ว">อนุมัติแล้ว</option>
+            <option value="ดำเนินการ">ดำเนินการ</option>
+            <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+            <option value="ยกเลิก">ยกเลิก</option>
+          </select>
+        </div>
+
       </div>
-      <div class="modal-footer border-0 pt-0">
-        <button class="btn px-4" style="background:var(--p);color:#fff;border-radius:20px"
+      <div class="modal-footer border-0 pt-2">
+        <button class="btn px-4 fw-bold" style="background:var(--p);color:#fff;border-radius:20px"
           onclick="saveProject()">
           <i class="bi bi-save-fill me-1"></i>บันทึกโครงการ
         </button>
@@ -358,18 +435,22 @@ body{background:linear-gradient(135deg,#ede9fe 0%,#fce7f3 50%,#ede9fe 100%);min-
   </div>
 </div>
 
-<!-- View Modal -->
+<!-- ══ VIEW MODAL ══════════════════════════════════════════════ -->
 <div class="modal fade" id="viewModal" tabindex="-1">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content" style="border-radius:18px;border:2px solid #ddd6fe">
+    <div class="modal-content" style="border-radius:18px;border:2px solid var(--border)">
       <div class="modal-header" style="background:linear-gradient(135deg,#4c1d95,var(--p));border-radius:16px 16px 0 0">
         <h5 class="modal-title text-white heading" id="view-title">รายละเอียดโครงการ</h5>
         <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-4" id="view-body"></div>
       <div class="modal-footer border-0">
-        <button class="btn px-4" style="background:var(--orange);color:#fff;border-radius:20px"
-          id="btn-edit-from-view" onclick="">
+        <button class="btn fw-bold" style="background:#d97706;color:#fff;border-radius:20px;display:none"
+          id="btn-approve" onclick="approveProject()">
+          <i class="bi bi-check-circle-fill me-1"></i>อนุมัติโครงการ
+        </button>
+        <button class="btn" style="background:#f59e0b;color:#fff;border-radius:20px;display:none"
+          id="btn-edit-from-view">
           <i class="bi bi-pencil-fill me-1"></i>แก้ไข
         </button>
         <button class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
@@ -380,336 +461,473 @@ body{background:linear-gradient(135deg,#ede9fe 0%,#fce7f3 50%,#ede9fe 100%);min-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-let CU = null, allProjects = [], isAdmin = false;
+let CU=null, allProjects=[], isAdmin=false, isDirector=false;
+let currentViewId=null;
 
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const s = JSON.parse(localStorage.getItem(APP_CONFIG.SESSION_KEY));
-    CU = s?.user;
-  } catch(e) {}
-  isAdmin = CU?.role === 'Director' || CU?.role === 'Admin' || CU?.role === 'PersonnelHead';
-  if (!isAdmin) document.getElementById('btn-add').style.display = 'none';
+document.addEventListener('DOMContentLoaded', async()=>{
+  try{const s=JSON.parse(localStorage.getItem(APP_CONFIG.SESSION_KEY));CU=s?.user;}catch(e){}
+  isDirector = CU?.role==='Director';
+  isAdmin    = isDirector || CU?.role==='Admin';
+  if(!isAdmin) document.getElementById('btn-add').style.display='none';
   await loadAll();
 });
 
-async function loadAll() {
+async function loadAll(){
   showOverlay('กำลังโหลด...');
-  const [stats, projects] = await Promise.all([
-    apiCall('getProjectStats', {}),
-    apiCall('getProjects', {})
-  ]);
+  const[stats,projects]=await Promise.all([apiCall('getProjectStats',{}),apiCall('getProjects',{})]);
   hideOverlay();
-  if (stats.status === 'success') renderStats(stats.stats, stats.byDept);
-  if (Array.isArray(projects)) {
-    allProjects = projects;
-    buildYearFilter();
-    filterProjects();
-    renderDeptCards(allProjects);
-  }
+  if(stats.status==='success') renderStats(stats.stats);
+  if(Array.isArray(projects)){allProjects=projects;buildYearFilter();filterProjects();}
 }
 
-function renderStats(s, byDept) {
-  document.getElementById('s-total').textContent       = s.total;
-  document.getElementById('s-inprogress').textContent  = s.inProgress;
-  document.getElementById('s-completed').textContent   = s.completed;
-  document.getElementById('s-budget').textContent      = (s.totalBudget||0).toLocaleString();
+function renderStats(s){
+  document.getElementById('s-total').textContent      = s.total;
+  document.getElementById('s-pending').textContent    = s.pending;
+  document.getElementById('s-approved').textContent   = s.approved;
+  document.getElementById('s-inprogress').textContent = s.inProgress;
+  document.getElementById('s-completed').textContent  = s.completed;
+  document.getElementById('s-budget').textContent     = (s.totalBudget||0).toLocaleString();
 }
 
-function buildYearFilter() {
-  const years = [...new Set(allProjects.map(p => p.Year).filter(Boolean))].sort().reverse();
-  const sel = document.getElementById('f-year');
-  sel.innerHTML = '<option value="ทั้งหมด">ทั้งหมด</option>' +
-    years.map(y => `<option>${y}</option>`).join('');
+function buildYearFilter(){
+  const yrs=[...new Set(allProjects.map(p=>p.Year).filter(Boolean))].sort().reverse();
+  const sel=document.getElementById('f-year');
+  sel.innerHTML='<option value="ทั้งหมด">ทั้งหมด</option>'+yrs.map(y=>`<option>${y}</option>`).join('');
 }
 
-function showTab(tab, el) {
-  document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('pane-list').classList.toggle('d-none', tab !== 'list');
-  document.getElementById('pane-dept').classList.toggle('d-none', tab !== 'dept');
-}
-
-function filterProjects() {
-  const q    = document.getElementById('f-search').value.toLowerCase();
-  const dept = document.getElementById('f-dept').value;
-  const st   = document.getElementById('f-status').value;
-  const yr   = document.getElementById('f-year').value;
-
-  const filtered = allProjects.filter(p => {
-    if (dept !== 'ทั้งหมด' && p.Department !== dept) return false;
-    if (st   !== 'ทั้งหมด' && p.Status !== st)       return false;
-    if (yr   !== 'ทั้งหมด' && String(p.Year) !== yr) return false;
-    if (q && !`${p.Name}${p.Owner}`.toLowerCase().includes(q)) return false;
+function filterProjects(){
+  const q=document.getElementById('f-search').value.toLowerCase();
+  const d=document.getElementById('f-dept').value;
+  const s=document.getElementById('f-status').value;
+  const y=document.getElementById('f-year').value;
+  const f=allProjects.filter(p=>{
+    if(d!=='ทั้งหมด'&&p.Department!==d)return false;
+    if(s!=='ทั้งหมด'&&p.Status!==s)return false;
+    if(y!=='ทั้งหมด'&&String(p.Year)!==y)return false;
+    if(q&&!`${p.Name}${p.Owner}`.toLowerCase().includes(q))return false;
     return true;
   });
-
-  document.getElementById('result-count').textContent = filtered.length + ' โครงการ';
-  renderTable(filtered);
+  document.getElementById('result-count').textContent=f.length+' โครงการ';
+  renderTable(f);
 }
 
-function renderTable(list) {
-  if (!list.length) {
-    document.getElementById('projBody').innerHTML =
-      '<tr><td colspan="9" class="text-center py-5 text-muted"><i class="bi bi-search" style="font-size:2rem;color:#c4b5fd;display:block;margin-bottom:8px"></i>ไม่พบข้อมูล</td></tr>';
+function renderTable(list){
+  if(!list.length){
+    document.getElementById('projBody').innerHTML='<tr><td colspan="9" class="text-center py-5 text-muted"><i class="bi bi-search" style="font-size:2rem;color:#c4b5fd;display:block;margin-bottom:8px"></i>ไม่พบข้อมูล</td></tr>';
     return;
   }
-  const budgetPct = p => {
-    const b = Number(p.Budget)||0, u = Number(p.UsedBudget)||0;
-    return b > 0 ? Math.min((u/b*100),100).toFixed(0) : 0;
-  };
-  document.getElementById('projBody').innerHTML = list.map((p,i) => `
+  const pct=p=>{const b=Number(p.Budget)||0,u=Number(p.UsedBudget)||0;return b>0?Math.min(u/b*100,100).toFixed(0):0;};
+  document.getElementById('projBody').innerHTML=list.map((p,i)=>`
     <tr>
       <td><span class="badge" style="background:#ede9fe;color:var(--p)">${i+1}</span></td>
       <td>
         <a href="#" class="fw-bold text-decoration-none" style="color:#4c1d95"
           onclick="viewProject('${p.ProjectID}')">${p.Name}</a>
-        ${p.BudgetSource ? `<div class="text-muted" style="font-size:.75rem">${p.BudgetSource}</div>` : ''}
+        <div class="text-muted" style="font-size:.75rem">${p.ProjectType||''} ${p.BudgetSource?'| '+p.BudgetSource:''}</div>
       </td>
       <td class="text-muted small">${p.Year||'-'}</td>
-      <td><span class="dept-badge">${p.Department||'-'}</span></td>
+      <td><span style="background:var(--sky);color:var(--p);border-radius:20px;padding:2px 10px;font-size:.74rem;font-weight:600">${p.Department||'-'}</span></td>
       <td class="small">${p.Owner||'-'}</td>
       <td class="text-end small fw-bold">${(Number(p.Budget)||0).toLocaleString()}</td>
       <td>
         <div class="fw-bold small text-end">${(Number(p.UsedBudget)||0).toLocaleString()}</div>
-        <div class="budget-bar"><div class="budget-fill" style="width:${budgetPct(p)}%"></div></div>
-        <div class="text-muted" style="font-size:.7rem;text-align:right">${budgetPct(p)}%</div>
+        <div class="budget-bar"><div class="budget-fill" style="width:${pct(p)}%"></div></div>
+        <div class="text-muted text-end" style="font-size:.7rem">${pct(p)}%</div>
       </td>
       <td><span class="status-badge st-${p.Status}">${p.Status||'-'}</span></td>
       <td>
-        <div class="d-flex gap-1">
+        <div class="d-flex gap-1 flex-wrap">
           <button class="btn btn-sm" style="background:#ede9fe;color:var(--p);border:none"
-            onclick="viewProject('${p.ProjectID}')">
-            <i class="bi bi-eye-fill"></i>
-          </button>
-          ${isAdmin ? `
+            onclick="viewProject('${p.ProjectID}')"><i class="bi bi-eye-fill"></i></button>
+          ${isAdmin?`
           <button class="btn btn-sm" style="background:#fef3c7;color:#92400e;border:none"
-            onclick="editProject('${p.ProjectID}')">
-            <i class="bi bi-pencil-fill"></i>
-          </button>
+            onclick="editProject('${p.ProjectID}')"><i class="bi bi-pencil-fill"></i></button>
           <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;border:none"
-            onclick="deleteProject('${p.ProjectID}')">
-            <i class="bi bi-trash-fill"></i>
-          </button>` : ''}
+            onclick="deleteProject('${p.ProjectID}')"><i class="bi bi-trash-fill"></i></button>`:''}
         </div>
       </td>
     </tr>`).join('');
 }
 
-function renderDeptCards(list) {
-  const byDept = {};
-  list.forEach(p => {
-    const d = p.Department || 'ไม่ระบุ';
-    if (!byDept[d]) byDept[d] = { count:0, budget:0, used:0, completed:0, inProgress:0 };
-    byDept[d].count++;
-    byDept[d].budget    += Number(p.Budget)||0;
-    byDept[d].used      += Number(p.UsedBudget)||0;
-    if (p.Status === 'เสร็จสิ้น')   byDept[d].completed++;
-    if (p.Status === 'ดำเนินการ')   byDept[d].inProgress++;
-  });
-  const icons = {วิชาการ:'bi-book-fill',บริหารทั่วไป:'bi-building',
-    บุคคล:'bi-people-fill',งบประมาณ:'bi-cash-stack',กิจการนักเรียน:'bi-person-badge-fill'};
-  document.getElementById('dept-cards').innerHTML = Object.entries(byDept).map(([d, s]) => `
-    <div class="col-md-4">
-      <div class="stat-card">
-        <div class="d-flex align-items-center gap-3 mb-3">
-          <div class="rounded-circle d-flex align-items-center justify-content-center"
-            style="width:48px;height:48px;background:var(--sky);font-size:1.4rem;flex-shrink:0">
-            <i class="bi ${icons[d]||'bi-folder'}" style="color:var(--p)"></i>
-          </div>
-          <div>
-            <div class="fw-bold heading">${d}</div>
-            <small class="text-muted">${s.count} โครงการ</small>
-          </div>
-        </div>
-        <div class="row g-2 text-center">
-          <div class="col-4">
-            <div class="fw-bold" style="color:var(--green)">${s.completed}</div>
-            <small class="text-muted">เสร็จสิ้น</small>
-          </div>
-          <div class="col-4">
-            <div class="fw-bold" style="color:var(--orange)">${s.inProgress}</div>
-            <small class="text-muted">ดำเนินการ</small>
-          </div>
-          <div class="col-4">
-            <div class="fw-bold" style="color:var(--p)">${s.budget.toLocaleString()}</div>
-            <small class="text-muted">งบ (บ.)</small>
-          </div>
-        </div>
-        <div class="budget-bar mt-2">
-          <div class="budget-fill" style="width:${s.budget>0?(s.used/s.budget*100).toFixed(0):0}%"></div>
-        </div>
-        <div class="text-muted mt-1" style="font-size:.75rem">
-          ใช้แล้ว ${s.used.toLocaleString()} จาก ${s.budget.toLocaleString()} บาท
-        </div>
-      </div>
-    </div>`).join('');
-}
-
-// ── View ──────────────────────────────────────────────────────────
-async function viewProject(id) {
+// ── VIEW ─────────────────────────────────────────────────────────
+async function viewProject(id){
+  currentViewId=id;
   showOverlay('กำลังโหลด...');
-  const res = await apiCall('getProjectById', { id });
+  const res=await apiCall('getProjectById',{id});
   hideOverlay();
-  if (res.status !== 'success') return Swal.fire({ icon:'error', title:res.message, confirmButtonColor:var_p() });
-  const p = res.project;
-  document.getElementById('view-title').textContent = p.Name;
-  document.getElementById('btn-edit-from-view').onclick = () => {
-    bootstrap.Modal.getInstance(document.getElementById('viewModal'))?.hide();
-    editProject(id);
-  };
-  document.getElementById('btn-edit-from-view').style.display = isAdmin ? '' : 'none';
+  if(res.status!=='success')return;
+  const p=res.project;
+  document.getElementById('view-title').textContent=p.Name;
 
-  const pct = p.Budget > 0 ? Math.min((p.UsedBudget/p.Budget*100),100).toFixed(1) : 0;
-  document.getElementById('view-body').innerHTML = `
+  // Parse PDCA and budget items
+  let pdcaRows='', budgetRows='', budgetTotal=0;
+  try{
+    const activities=JSON.parse(p.Activities||'[]');
+    pdcaRows=activities.map((a,i)=>`<tr>
+      <td class="text-center">${i+1}</td><td>${a.activity||''}</td>
+      <td>${a.period||''}</td><td>${a.owner||''}</td>
+    </tr>`).join('');
+  }catch(e){pdcaRows=`<tr><td colspan="4" class="text-muted">${p.Activities||'-'}</td></tr>`;}
+  try{
+    const items=JSON.parse(p.BudgetItems||'[]');
+    budgetRows=items.map((it,i)=>{
+      const total=(Number(it.qty)||0)*(Number(it.price)||0);
+      budgetTotal+=total;
+      return `<tr><td class="text-center">${i+1}</td><td>${it.name||''}</td>
+        <td class="text-center">${it.qty||0}</td>
+        <td class="text-end">${(Number(it.price)||0).toLocaleString()}</td>
+        <td class="text-end fw-bold">${total.toLocaleString()}</td></tr>`;
+    }).join('');
+  }catch(e){budgetRows=`<tr><td colspan="5" class="text-muted">${p.BudgetItems||'-'}</td></tr>`;}
+
+  const pct=Number(p.Budget)>0?Math.min(Number(p.UsedBudget)/Number(p.Budget)*100,100).toFixed(1):0;
+
+  document.getElementById('view-body').innerHTML=`
+    <!-- Header Info -->
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <span style="background:var(--sky);color:var(--p);border-radius:20px;padding:3px 12px;font-size:.8rem;font-weight:600">${p.Department||'-'}</span>
+      <span class="status-badge st-${p.Status}">${p.Status||'-'}</span>
+      <span class="text-muted small">ปี ${p.Year||'-'} | ${p.ProjectType||'-'} | ${p.Period||'-'}</span>
+      ${p.ApprovedBy?`<span class="text-muted small">อนุมัติโดย: ${p.ApprovedBy} (${p.ApprovedDate})</span>`:''}
+    </div>
+
     <div class="row g-3">
       <div class="col-md-8">
-        <div class="d-flex flex-wrap gap-2 mb-3">
-          <span class="dept-badge">${p.Department||'-'}</span>
-          <span class="status-badge st-${p.Status}">${p.Status||'-'}</span>
-          <span class="text-muted small">ปี ${p.Year||'-'}</span>
+        <!-- ข้อมูลทั่วไป -->
+        <div class="detail-sec">
+          <table class="table table-sm table-borderless mb-0">
+            <tr><td class="text-muted" style="width:30%;font-size:.83rem">ผู้รับผิดชอบ</td><td class="fw-bold small">${p.Owner||'-'}</td></tr>
+            <tr><td class="text-muted" style="font-size:.83rem">สนองกลยุทธ์</td><td class="small">ข้อที่ ${p.Strategy||'-'}</td></tr>
+            <tr><td class="text-muted" style="font-size:.83rem">มาตรฐาน</td><td class="small">${p.Standard||'-'}</td></tr>
+            <tr><td class="text-muted" style="font-size:.83rem">สถานที่</td><td class="small">${p.Location||'-'}</td></tr>
+            <tr><td class="text-muted" style="font-size:.83rem">หน่วยงานที่เกี่ยวข้อง</td><td class="small">${p.RelatedAgency||'-'}</td></tr>
+          </table>
         </div>
-        <table class="table table-sm table-borderless mb-3">
-          <tr><td class="text-muted" style="width:35%">ผู้รับผิดชอบ</td>
-              <td class="fw-bold">${p.Owner||'-'}</td></tr>
-          <tr><td class="text-muted">แหล่งงบประมาณ</td>
-              <td>${p.BudgetSource||'-'}</td></tr>
-        </table>
-        ${sec('วัตถุประสงค์',p.Objective)}
-        ${sec('เป้าหมายเชิงปริมาณ',p.QuantTarget)}
-        ${sec('เป้าหมายเชิงคุณภาพ',p.QualTarget)}
-        ${sec('กิจกรรมที่ดำเนินการ',p.Activities)}
-        ${sec('ผลการดำเนินงาน',p.Results)}
-        ${sec('ปัญหาและข้อเสนอแนะ',p.Issues)}
-        ${sec('สรุปโครงการ',p.Summary)}
-      </div>
-      <div class="col-md-4">
-        <div class="stat-card">
-          <div class="heading fw-bold mb-3" style="color:var(--p)">
-            <i class="bi bi-currency-exchange me-1"></i>งบประมาณ
+        ${dsec('หลักการและเหตุผล',p.Principle)}
+        ${dsec('วัตถุประสงค์',p.Objective)}
+        ${dsec('เป้าหมายเชิงปริมาณ',p.QuantTarget)}
+        ${dsec('เป้าหมายเชิงคุณภาพ',p.QualTarget)}
+
+        <!-- PDCA Table -->
+        <div class="detail-sec">
+          <h6>วิธีการดำเนินการ</h6>
+          <div class="table-responsive">
+            <table class="table table-bordered pdca-table mb-0">
+              <thead><tr><th style="width:5%">ที่</th><th>กิจกรรม</th><th style="width:20%">ระยะเวลา</th><th style="width:25%">ผู้รับผิดชอบ</th></tr></thead>
+              <tbody>${pdcaRows||'<tr><td colspan="4" class="text-muted text-center">-</td></tr>'}</tbody>
+            </table>
           </div>
-          <div class="text-muted small">งบที่ได้รับจัดสรร</div>
+        </div>
+
+        ${dsec('การติดตามประเมินผล',p.Evaluation)}
+        ${dsec('ผลที่คาดว่าจะได้รับ',p.ExpectedResults)}
+        ${p.Results?dsec('ผลการดำเนินงาน',p.Results):''}
+        ${p.Issues?dsec('ปัญหาและข้อเสนอแนะ',p.Issues):''}
+        ${p.Summary?dsec('สรุปโครงการ',p.Summary):''}
+      </div>
+
+      <div class="col-md-4">
+        <!-- งบประมาณ -->
+        <div class="stat-card mb-3">
+          <div class="heading fw-bold mb-3" style="color:var(--p)"><i class="bi bi-cash-stack me-1"></i>งบประมาณ</div>
+          <div class="text-muted small">แหล่งงบ: ${p.BudgetSource||'-'}</div>
+          <div class="text-muted small mt-2">งบที่ได้รับจัดสรร</div>
           <div class="fw-bold fs-5" style="color:var(--p)">${(Number(p.Budget)||0).toLocaleString()} บาท</div>
           <div class="text-muted small mt-2">งบที่ใช้จริง</div>
           <div class="fw-bold fs-5" style="color:var(--s)">${(Number(p.UsedBudget)||0).toLocaleString()} บาท</div>
-          <div class="budget-bar mt-3">
-            <div class="budget-fill" style="width:${pct}%"></div>
-          </div>
+          <div class="budget-bar mt-3"><div class="budget-fill" style="width:${pct}%"></div></div>
           <div class="d-flex justify-content-between mt-1">
             <small class="text-muted">ใช้แล้ว ${pct}%</small>
-            <small style="color:var(--green)">คงเหลือ ${(Number(p.Budget||0)-Number(p.UsedBudget||0)).toLocaleString()} บ.</small>
+            <small style="color:#059669">คงเหลือ ${(Number(p.Budget||0)-Number(p.UsedBudget||0)).toLocaleString()} บ.</small>
+          </div>
+        </div>
+
+        <!-- รายการค่าใช้จ่าย -->
+        <div class="stat-card">
+          <div class="heading fw-bold mb-2" style="color:var(--p);font-size:.85rem"><i class="bi bi-list-ul me-1"></i>รายละเอียดงบประมาณ</div>
+          <div class="table-responsive">
+            <table class="table table-bordered budget-table table-sm mb-0">
+              <thead><tr><th>ที่</th><th>รายการ</th><th class="text-end">รวม (บ.)</th></tr></thead>
+              <tbody>${budgetRows||'<tr><td colspan="3" class="text-muted text-center">-</td></tr>'}</tbody>
+              <tfoot><tr class="budget-total">
+                <td colspan="2" class="text-end fw-bold">รวมทั้งสิ้น</td>
+                <td class="text-end fw-bold" style="color:var(--p)">${budgetTotal.toLocaleString()}</td>
+              </tr></tfoot>
+            </table>
           </div>
         </div>
       </div>
-    </div>`;
+    </div>
+  `;
+
+  // Show approve button for Director on pending projects
+  const btnApprove = document.getElementById('btn-approve');
+  const btnEdit    = document.getElementById('btn-edit-from-view');
+  btnApprove.style.display = (isDirector && p.Status==='รออนุมัติ') ? '' : 'none';
+  btnEdit.style.display    = isAdmin ? '' : 'none';
+  btnEdit.onclick = ()=>{ bootstrap.Modal.getInstance(document.getElementById('viewModal'))?.hide(); editProject(id); };
+
   new bootstrap.Modal(document.getElementById('viewModal')).show();
 }
 
-function sec(title, content) {
-  if (!content) return '';
-  return `<div class="mb-3">
-    <div class="fw-bold small" style="color:var(--p);margin-bottom:4px">${title}</div>
-    <div style="background:#faf5ff;border-radius:8px;padding:10px 14px;font-size:.88rem;
-      color:#1e1b4b;line-height:1.7">${String(content).replace(/\n/g,'<br>')}</div>
-  </div>`;
+function dsec(title,content){
+  if(!content)return'';
+  return`<div class="detail-sec"><h6>${title}</h6><p>${String(content).replace(/\n/g,'<br>')}</p></div>`;
 }
 
-// ── Add/Edit ──────────────────────────────────────────────────────
-function openAddModal() {
-  document.getElementById('proj-id').value = '';
-  document.getElementById('modal-title-text').textContent = 'เพิ่มโครงการใหม่';
-  ['p-name','p-year','p-owner','p-budget','p-used','p-source',
-   'p-obj','p-quant','p-qual','p-activities','p-results','p-issues','p-summary']
-    .forEach(id => document.getElementById(id).value = '');
-  document.getElementById('p-dept').value = 'วิชาการ';
-  document.getElementById('p-status').value = 'ยังไม่เริ่ม';
-  new bootstrap.Modal(document.getElementById('projModal')).show();
-}
-
-async function editProject(id) {
-  showOverlay('กำลังโหลด...');
-  const res = await apiCall('getProjectById', { id });
-  hideOverlay();
-  if (res.status !== 'success') return;
-  const p = res.project;
-  document.getElementById('proj-id').value = p.ProjectID;
-  document.getElementById('modal-title-text').textContent = 'แก้ไขโครงการ';
-  document.getElementById('p-name').value       = p.Name||'';
-  document.getElementById('p-year').value       = p.Year||'';
-  document.getElementById('p-dept').value       = p.Department||'วิชาการ';
-  document.getElementById('p-owner').value      = p.Owner||'';
-  document.getElementById('p-budget').value     = p.Budget||0;
-  document.getElementById('p-used').value       = p.UsedBudget||0;
-  document.getElementById('p-source').value     = p.BudgetSource||'';
-  document.getElementById('p-status').value     = p.Status||'ยังไม่เริ่ม';
-  document.getElementById('p-obj').value        = p.Objective||'';
-  document.getElementById('p-quant').value      = p.QuantTarget||'';
-  document.getElementById('p-qual').value       = p.QualTarget||'';
-  document.getElementById('p-activities').value = p.Activities||'';
-  document.getElementById('p-results').value    = p.Results||'';
-  document.getElementById('p-issues').value     = p.Issues||'';
-  document.getElementById('p-summary').value    = p.Summary||'';
-  new bootstrap.Modal(document.getElementById('projModal')).show();
-}
-
-async function saveProject() {
-  const name = document.getElementById('p-name').value.trim();
-  if (!name) return Swal.fire({ icon:'warning', title:'กรุณาระบุชื่อโครงการ', confirmButtonColor:var_p() });
-  const id = document.getElementById('proj-id').value;
-  const data = {
-    ProjectID: id, Name: name,
-    Year:         document.getElementById('p-year').value.trim(),
-    Department:   document.getElementById('p-dept').value,
-    Owner:        document.getElementById('p-owner').value.trim(),
-    Budget:       document.getElementById('p-budget').value,
-    UsedBudget:   document.getElementById('p-used').value,
-    BudgetSource: document.getElementById('p-source').value.trim(),
-    Status:       document.getElementById('p-status').value,
-    Objective:    document.getElementById('p-obj').value.trim(),
-    QuantTarget:  document.getElementById('p-quant').value.trim(),
-    QualTarget:   document.getElementById('p-qual').value.trim(),
-    Activities:   document.getElementById('p-activities').value.trim(),
-    Results:      document.getElementById('p-results').value.trim(),
-    Issues:       document.getElementById('p-issues').value.trim(),
-    Summary:      document.getElementById('p-summary').value.trim()
-  };
+async function approveProject(){
+  const r=await Swal.fire({icon:'question',title:'อนุมัติโครงการนี้?',
+    showCancelButton:true,confirmButtonColor:'#059669',cancelButtonColor:'#94a3b8',
+    confirmButtonText:'อนุมัติ',cancelButtonText:'ยกเลิก'});
+  if(!r.isConfirmed)return;
   showOverlay('กำลังบันทึก...');
-  const res = await apiCall(id ? 'updateProject' : 'saveProject', { data });
+  const res=await apiCall('approveProject',{projectId:currentViewId});
   hideOverlay();
-  bootstrap.Modal.getInstance(document.getElementById('projModal'))?.hide();
-  if (res.status === 'success') {
-    Swal.fire({ icon:'success', title:'✅ ' + res.message, timer:1500, showConfirmButton:false });
+  bootstrap.Modal.getInstance(document.getElementById('viewModal'))?.hide();
+  if(res.status==='success'){
+    Swal.fire({icon:'success',title:'อนุมัติโครงการแล้ว',timer:1500,showConfirmButton:false});
     await loadAll();
-  } else {
-    Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:res.message, confirmButtonColor:var_p() });
+  }else{
+    Swal.fire({icon:'error',title:'เกิดข้อผิดพลาด',text:res.message,confirmButtonColor:'#7c3aed'});
   }
 }
 
-async function deleteProject(id) {
-  const r = await Swal.fire({ icon:'warning', title:'ลบโครงการนี้?',
-    text:'ข้อมูลที่ลบแล้วไม่สามารถกู้คืนได้',
-    showCancelButton:true, confirmButtonColor:'#dc2626',
-    cancelButtonColor:'#94a3b8', confirmButtonText:'ลบ', cancelButtonText:'ยกเลิก' });
-  if (!r.isConfirmed) return;
-  showOverlay('กำลังลบ...');
-  const res = await apiCall('deleteProject', { id });
-  hideOverlay();
-  Swal.fire({ icon: res.status==='success'?'success':'error',
-    title: res.status==='success'?'ลบเรียบร้อย':res.message,
-    timer:1500, showConfirmButton:false });
-  if (res.status === 'success') await loadAll();
+// ── PDCA helpers ──────────────────────────────────────────────────
+function addPdcaRow(){
+  const tbody=document.getElementById('pdca-body');
+  const n=tbody.rows.length+1;
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td class="text-center">${n}</td>
+    <td><input class="form-control form-control-sm" placeholder="กิจกรรม / ขั้นตอน"></td>
+    <td><input class="form-control form-control-sm" placeholder="ระยะเวลา"></td>
+    <td><input class="form-control form-control-sm" placeholder="ผู้รับผิดชอบ"></td>
+    <td><button class="btn btn-sm btn-outline-danger" onclick="removePdcaRow(this)">×</button></td>`;
+  tbody.appendChild(tr);
+}
+function removePdcaRow(btn){
+  const tbody=document.getElementById('pdca-body');
+  if(tbody.rows.length>1) btn.closest('tr').remove();
+  reIndexTable('pdca-body');
 }
 
-// ── Helpers ───────────────────────────────────────────────────────
-function var_p() { return '#7c3aed'; }
-async function apiCall(action, params={}) {
-  const s = (() => { try { return JSON.parse(localStorage.getItem(APP_CONFIG.SESSION_KEY)); } catch{return null;} })();
-  const b = { action, ...params,
-    ...(s ? { sessionToken: s.sessionToken || s.token, userId: s.user?.id } : {}) };
-  const r = await fetch(APP_CONFIG.GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(b) });
+// ── Budget helpers ────────────────────────────────────────────────
+function addBudgetRow(){
+  const tbody=document.getElementById('budget-body');
+  const n=tbody.rows.length+1;
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td class="text-center">${n}</td>
+    <td><input class="form-control form-control-sm" placeholder="รายการ"></td>
+    <td><input type="number" class="form-control form-control-sm budget-qty" min="1" value="1" oninput="calcRow(this)"></td>
+    <td><input type="number" class="form-control form-control-sm budget-price" min="0" step="0.01" oninput="calcRow(this)"></td>
+    <td><input type="number" class="form-control form-control-sm budget-total" readonly style="background:#f5f3ff;font-weight:700"></td>
+    <td><button class="btn btn-sm btn-outline-danger" onclick="removeBudgetRow(this)">×</button></td>`;
+  tbody.appendChild(tr);
+}
+function removeBudgetRow(btn){
+  const tbody=document.getElementById('budget-body');
+  if(tbody.rows.length>1){btn.closest('tr').remove();updateBudgetTotal();}
+  reIndexTable('budget-body');
+}
+function calcRow(inp){
+  const tr=inp.closest('tr');
+  const qty=Number(tr.querySelector('.budget-qty').value)||0;
+  const price=Number(tr.querySelector('.budget-price').value)||0;
+  tr.querySelector('.budget-total').value=(qty*price).toFixed(2);
+  updateBudgetTotal();
+}
+function updateBudgetTotal(){
+  let total=0;
+  document.querySelectorAll('#budget-body .budget-total').forEach(el=>total+=Number(el.value)||0);
+  document.getElementById('budget-grand-total').value=total.toFixed(2);
+  document.getElementById('p-budget').value=total.toFixed(2);
+}
+function reIndexTable(tbodyId){
+  const rows=document.getElementById(tbodyId).rows;
+  for(let i=0;i<rows.length;i++) rows[i].cells[0].textContent=i+1;
+}
+
+// ── ADD/EDIT ──────────────────────────────────────────────────────
+function openAddModal(){
+  document.getElementById('proj-id').value='';
+  document.getElementById('modal-title-text').textContent='แบบเสนอโครงการใหม่';
+  ['p-name','p-year','p-owner','p-source','p-strategy','p-standard',
+   'p-location','p-agency','p-principle','p-objective','p-quant','p-qual',
+   'p-budget','p-used','p-eval','p-expected','p-results','p-issues','p-summary']
+    .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('p-dept').value='วิชาการ';
+  document.getElementById('p-type').value='โครงการใหม่';
+  document.getElementById('p-period').value='ตลอดปีการศึกษา';
+  document.getElementById('p-status').value='ร่าง';
+  // Reset PDCA
+  document.getElementById('pdca-body').innerHTML=`<tr>
+    <td class="text-center">1</td>
+    <td><input class="form-control form-control-sm" placeholder="ขั้นวางแผน (Plan): ..."></td>
+    <td><input class="form-control form-control-sm" placeholder="ระยะเวลา"></td>
+    <td><input class="form-control form-control-sm" placeholder="ผู้รับผิดชอบ"></td>
+    <td><button class="btn btn-sm btn-outline-danger" onclick="removePdcaRow(this)">×</button></td>
+  </tr>`;
+  // Reset budget
+  document.getElementById('budget-body').innerHTML=`<tr>
+    <td class="text-center">1</td>
+    <td><input class="form-control form-control-sm" placeholder="รายการค่าใช้จ่าย"></td>
+    <td><input type="number" class="form-control form-control-sm budget-qty" min="1" value="1" oninput="calcRow(this)"></td>
+    <td><input type="number" class="form-control form-control-sm budget-price" min="0" step="0.01" oninput="calcRow(this)"></td>
+    <td><input type="number" class="form-control form-control-sm budget-total" readonly style="background:#f5f3ff;font-weight:700"></td>
+    <td><button class="btn btn-sm btn-outline-danger" onclick="removeBudgetRow(this)">×</button></td>
+  </tr>`;
+  document.getElementById('budget-grand-total').value='';
+  new bootstrap.Modal(document.getElementById('projModal')).show();
+}
+
+async function editProject(id){
+  showOverlay('กำลังโหลด...');
+  const res=await apiCall('getProjectById',{id});
+  hideOverlay();
+  if(res.status!=='success')return;
+  const p=res.project;
+  document.getElementById('proj-id').value=p.ProjectID;
+  document.getElementById('modal-title-text').textContent='แก้ไขโครงการ';
+  document.getElementById('p-name').value=p.Name||'';
+  document.getElementById('p-year').value=p.Year||'';
+  document.getElementById('p-dept').value=p.Department||'วิชาการ';
+  document.getElementById('p-type').value=p.ProjectType||'โครงการใหม่';
+  document.getElementById('p-owner').value=p.Owner||'';
+  document.getElementById('p-strategy').value=p.Strategy||'';
+  document.getElementById('p-standard').value=p.Standard||'';
+  document.getElementById('p-location').value=p.Location||'';
+  document.getElementById('p-period').value=p.Period||'ตลอดปีการศึกษา';
+  document.getElementById('p-agency').value=p.RelatedAgency||'';
+  document.getElementById('p-principle').value=p.Principle||'';
+  document.getElementById('p-objective').value=p.Objective||'';
+  document.getElementById('p-quant').value=p.QuantTarget||'';
+  document.getElementById('p-qual').value=p.QualTarget||'';
+  document.getElementById('p-source').value=p.BudgetSource||'';
+  document.getElementById('p-budget').value=p.Budget||0;
+  document.getElementById('p-used').value=p.UsedBudget||0;
+  document.getElementById('p-eval').value=p.Evaluation||'';
+  document.getElementById('p-expected').value=p.ExpectedResults||'';
+  document.getElementById('p-results').value=p.Results||'';
+  document.getElementById('p-issues').value=p.Issues||'';
+  document.getElementById('p-summary').value=p.Summary||'';
+  document.getElementById('p-status').value=p.Status||'ร่าง';
+
+  // Restore PDCA rows
+  try{
+    const acts=JSON.parse(p.Activities||'[]');
+    if(acts.length){
+      document.getElementById('pdca-body').innerHTML=acts.map((a,i)=>`<tr>
+        <td class="text-center">${i+1}</td>
+        <td><input class="form-control form-control-sm" value="${a.activity||''}" placeholder="กิจกรรม"></td>
+        <td><input class="form-control form-control-sm" value="${a.period||''}" placeholder="ระยะเวลา"></td>
+        <td><input class="form-control form-control-sm" value="${a.owner||''}" placeholder="ผู้รับผิดชอบ"></td>
+        <td><button class="btn btn-sm btn-outline-danger" onclick="removePdcaRow(this)">×</button></td>
+      </tr>`).join('');
+    }
+  }catch(e){}
+
+  // Restore budget rows
+  try{
+    const items=JSON.parse(p.BudgetItems||'[]');
+    if(items.length){
+      document.getElementById('budget-body').innerHTML=items.map((it,i)=>`<tr>
+        <td class="text-center">${i+1}</td>
+        <td><input class="form-control form-control-sm" value="${it.name||''}" placeholder="รายการ"></td>
+        <td><input type="number" class="form-control form-control-sm budget-qty" value="${it.qty||1}" oninput="calcRow(this)"></td>
+        <td><input type="number" class="form-control form-control-sm budget-price" value="${it.price||0}" step="0.01" oninput="calcRow(this)"></td>
+        <td><input type="number" class="form-control form-control-sm budget-total" value="${(Number(it.qty||1)*Number(it.price||0)).toFixed(2)}" readonly style="background:#f5f3ff;font-weight:700"></td>
+        <td><button class="btn btn-sm btn-outline-danger" onclick="removeBudgetRow(this)">×</button></td>
+      </tr>`).join('');
+      updateBudgetTotal();
+    }
+  }catch(e){}
+
+  new bootstrap.Modal(document.getElementById('projModal')).show();
+}
+
+async function saveProject(){
+  const name=document.getElementById('p-name').value.trim();
+  if(!name)return Swal.fire({icon:'warning',title:'กรุณาระบุชื่อโครงการ',confirmButtonColor:'#7c3aed'});
+
+  // Collect PDCA rows
+  const pdcaRows=[];
+  document.querySelectorAll('#pdca-body tr').forEach(tr=>{
+    const inputs=tr.querySelectorAll('input');
+    if(inputs[0]&&inputs[0].value) pdcaRows.push({activity:inputs[0].value,period:inputs[1]?.value||'',owner:inputs[2]?.value||''});
+  });
+
+  // Collect budget items
+  const budgetItems=[];
+  document.querySelectorAll('#budget-body tr').forEach(tr=>{
+    const inputs=tr.querySelectorAll('input');
+    if(inputs[0]&&inputs[0].value) budgetItems.push({
+      name:inputs[0].value,qty:Number(inputs[1]?.value)||1,price:Number(inputs[2]?.value)||0
+    });
+  });
+
+  const id=document.getElementById('proj-id').value;
+  const data={
+    ProjectID:id, Name:name,
+    Year:document.getElementById('p-year').value.trim(),
+    Department:document.getElementById('p-dept').value,
+    ProjectType:document.getElementById('p-type').value,
+    Owner:document.getElementById('p-owner').value.trim(),
+    Strategy:document.getElementById('p-strategy').value.trim(),
+    Standard:document.getElementById('p-standard').value.trim(),
+    Location:document.getElementById('p-location').value.trim(),
+    Period:document.getElementById('p-period').value,
+    RelatedAgency:document.getElementById('p-agency').value.trim(),
+    Principle:document.getElementById('p-principle').value.trim(),
+    Objective:document.getElementById('p-objective').value.trim(),
+    QuantTarget:document.getElementById('p-quant').value.trim(),
+    QualTarget:document.getElementById('p-qual').value.trim(),
+    Activities:JSON.stringify(pdcaRows),
+    BudgetSource:document.getElementById('p-source').value.trim(),
+    Budget:document.getElementById('p-budget').value||0,
+    UsedBudget:document.getElementById('p-used').value||0,
+    BudgetItems:JSON.stringify(budgetItems),
+    Evaluation:document.getElementById('p-eval').value.trim(),
+    ExpectedResults:document.getElementById('p-expected').value.trim(),
+    Results:document.getElementById('p-results').value.trim(),
+    Issues:document.getElementById('p-issues').value.trim(),
+    Summary:document.getElementById('p-summary').value.trim(),
+    Status:document.getElementById('p-status').value,
+    proposedBy:CU?.id
+  };
+
+  showOverlay('กำลังบันทึก...');
+  const res=await apiCall(id?'updateProject':'saveProject',{data});
+  hideOverlay();
+  bootstrap.Modal.getInstance(document.getElementById('projModal'))?.hide();
+  if(res.status==='success'){
+    Swal.fire({icon:'success',title:'✅ '+res.message,timer:1500,showConfirmButton:false});
+    await loadAll();
+  }else{
+    Swal.fire({icon:'error',title:'เกิดข้อผิดพลาด',text:res.message,confirmButtonColor:'#7c3aed'});
+  }
+}
+
+async function deleteProject(id){
+  const r=await Swal.fire({icon:'warning',title:'ลบโครงการนี้?',
+    showCancelButton:true,confirmButtonColor:'#dc2626',cancelButtonColor:'#94a3b8',
+    confirmButtonText:'ลบ',cancelButtonText:'ยกเลิก'});
+  if(!r.isConfirmed)return;
+  showOverlay('กำลังลบ...');
+  const res=await apiCall('deleteProject',{id});
+  hideOverlay();
+  if(res.status==='success'){
+    Swal.fire({icon:'success',title:'ลบเรียบร้อย',timer:1200,showConfirmButton:false});
+    await loadAll();
+  }
+}
+
+async function apiCall(action,params={}){
+  const s=(()=>{try{return JSON.parse(localStorage.getItem(APP_CONFIG.SESSION_KEY));}catch{return null;}})();
+  const b={action,...params,...(s?{sessionToken:s.sessionToken||s.token,userId:s.user?.id}:{})};
+  const r=await fetch(APP_CONFIG.GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(b)});
   return r.json();
 }
-function showOverlay(t='') { document.getElementById('overlay-text').textContent=t; document.getElementById('overlay').style.display='flex'; }
-function hideOverlay() { document.getElementById('overlay').style.display='none'; }
+function showOverlay(t=''){document.getElementById('overlay-text').textContent=t;document.getElementById('overlay').style.display='flex';}
+function hideOverlay(){document.getElementById('overlay').style.display='none';}
 </script>
 </body>
 </html>

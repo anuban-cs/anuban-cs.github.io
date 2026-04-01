@@ -97,6 +97,7 @@ function doPost(e) {
       case 'saveProject':          res = saveProject(body.data); break;
       case 'updateProject':        res = updateProject(body.data); break;
       case 'deleteProject':        res = deleteProject(body.id); break;
+      case 'approveProject':       res = approveProject(body.projectId, body.userId); break;
       case 'getProjectStats':      res = getProjectStats(); break;
       // ── Evaluation ──
       case 'getEvalPeriods':          res = getEvalPeriods(); break;
@@ -1803,3 +1804,209 @@ function getProjectStats() {
     return { status:'success', stats:stats, byDept:byDept, recent:recent };
   } catch(e) { return { status:'error', message:e.toString() }; }
 }
+
+// ═══════════════════════════════════════════════════════════════
+//  PROJECT MANAGEMENT — ระบบบริหารโครงการ (ฉบับแบบฟอร์มโรงเรียน)
+//
+//  Sheet "Projects" columns:
+//  ProjectID | Name | Year | Department | ProjectType | Strategy |
+//  Standard | Owner | Location | Period | RelatedAgency |
+//  Principle | Objective | QuantTarget | QualTarget | Activities |
+//  BudgetSource | Budget | UsedBudget | BudgetItems |
+//  Evaluation | ExpectedResults | Results | Issues | Summary |
+//  Status | ApprovedBy | ApprovedDate | CreatedAt | UpdatedAt
+// ═══════════════════════════════════════════════════════════════
+
+var PROJECT_STATUS = {
+  DRAFT:       'ร่าง',
+  PENDING:     'รออนุมัติ',
+  APPROVED:    'อนุมัติแล้ว',
+  IN_PROGRESS: 'ดำเนินการ',
+  COMPLETED:   'เสร็จสิ้น',
+  CANCELLED:   'ยกเลิก'
+};
+
+var PROJECT_HEADERS = [
+  'ProjectID','Name','Year','Department','ProjectType','Strategy',
+  'Standard','Owner','Location','Period','RelatedAgency',
+  'Principle','Objective','QuantTarget','QualTarget','Activities',
+  'BudgetSource','Budget','UsedBudget','BudgetItems',
+  'Evaluation','ExpectedResults','Results','Issues','Summary',
+  'Status','ApprovedBy','ApprovedDate','CreatedAt','UpdatedAt'
+];
+
+function getProjectsSheet() {
+  var sh = ssheet().getSheetByName('Projects');
+  if (!sh) throw new Error('ไม่พบ Sheet Projects กรุณาสร้าง Sheet ก่อน');
+  return sh;
+}
+
+function _projectRowToObj(hdrs, row) {
+  var p = {};
+  hdrs.forEach(function(h, j) {
+    p[h] = row[j] instanceof Date ? fmtDate(row[j]) : (row[j] || '');
+  });
+  return p;
+}
+
+function getProjects(filters) {
+  try {
+    var sh   = getProjectsSheet();
+    var rows = sh.getDataRange().getValues();
+    if (rows.length <= 1) return [];
+    var hdrs = rows[0], out = [];
+    for (var i = 1; i < rows.length; i++) {
+      if (!rows[i][0]) continue;
+      var p = _projectRowToObj(hdrs, rows[i]);
+      if (filters) {
+        if (filters.department && filters.department !== 'ทั้งหมด' && p.Department !== filters.department) continue;
+        if (filters.status     && filters.status     !== 'ทั้งหมด' && p.Status     !== filters.status)     continue;
+        if (filters.year       && filters.year       !== 'ทั้งหมด' && String(p.Year) !== String(filters.year)) continue;
+        if (filters.search) {
+          var s = filters.search.toLowerCase();
+          if (String(p.Name||'').toLowerCase().indexOf(s) < 0 &&
+              String(p.Owner||'').toLowerCase().indexOf(s) < 0) continue;
+        }
+      }
+      out.push(p);
+    }
+    return out;
+  } catch(e) { return { status:'error', message:e.toString() }; }
+}
+
+function getProjectById(id) {
+  try {
+    var sh = getProjectsSheet(), rows = sh.getDataRange().getValues(), hdrs = rows[0];
+    for (var i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]) !== String(id)) continue;
+      return { status:'success', project: _projectRowToObj(hdrs, rows[i]) };
+    }
+    return { status:'error', message:'ไม่พบโครงการ' };
+  } catch(e) { return { status:'error', message:e.toString() }; }
+}
+
+function saveProject(d) {
+  try {
+    var sh  = getProjectsSheet();
+    var tz  = Session.getScriptTimeZone();
+    var now = Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm');
+    var id  = 'PRJ-' + Utilities.formatDate(new Date(), tz, 'yyMMddHHmmss');
+    sh.appendRow([
+      id, d.Name||'', d.Year||'', d.Department||'', d.ProjectType||'โครงการใหม่',
+      d.Strategy||'', d.Standard||'', d.Owner||'', d.Location||'', d.Period||'',
+      d.RelatedAgency||'', d.Principle||'', d.Objective||'', d.QuantTarget||'',
+      d.QualTarget||'', d.Activities||'', d.BudgetSource||'',
+      Number(d.Budget)||0, Number(d.UsedBudget)||0, d.BudgetItems||'[]',
+      d.Evaluation||'', d.ExpectedResults||'', d.Results||'',
+      d.Issues||'', d.Summary||'',
+      d.Status||PROJECT_STATUS.DRAFT, '', '', now, now
+    ]);
+    SpreadsheetApp.flush();
+    return { status:'success', message:'บันทึกโครงการเรียบร้อย', id:id };
+  } catch(e) { return { status:'error', message:e.toString() }; }
+}
+
+function updateProject(d) {
+  try {
+    var sh = getProjectsSheet(), rows = sh.getDataRange().getValues(), hdrs = rows[0];
+    var tz = Session.getScriptTimeZone();
+    var now = Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm');
+    for (var i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]) !== String(d.ProjectID)) continue;
+      var row = rows[i];
+      var upd = {
+        Name:d.Name, Year:d.Year, Department:d.Department, ProjectType:d.ProjectType,
+        Strategy:d.Strategy, Standard:d.Standard, Owner:d.Owner, Location:d.Location,
+        Period:d.Period, RelatedAgency:d.RelatedAgency, Principle:d.Principle,
+        Objective:d.Objective, QuantTarget:d.QuantTarget, QualTarget:d.QualTarget,
+        Activities:d.Activities, BudgetSource:d.BudgetSource,
+        Budget:Number(d.Budget)||0, UsedBudget:Number(d.UsedBudget)||0,
+        BudgetItems:d.BudgetItems||'[]', Evaluation:d.Evaluation,
+        ExpectedResults:d.ExpectedResults, Results:d.Results,
+        Issues:d.Issues, Summary:d.Summary,
+        Status:d.Status, ApprovedBy:d.ApprovedBy||'', ApprovedDate:d.ApprovedDate||'',
+        UpdatedAt:now
+      };
+      hdrs.forEach(function(h, j) { if (upd[h] !== undefined) row[j] = upd[h]; });
+      sh.getRange(i+1, 1, 1, row.length).setValues([row]);
+      SpreadsheetApp.flush();
+
+      // แจ้ง Director เมื่อสถานะเป็น "รออนุมัติ"
+      if (d.Status === PROJECT_STATUS.PENDING) {
+        var proposer = getUserInfo(d.proposedBy || '');
+        notifyRole('Director',
+          '📋 มีโครงการรออนุมัติ\n'
+          +'ชื่อ: '+d.Name+'\n'
+          +'ฝ่าย: '+d.Department+'\n'
+          +'งบ: '+(Number(d.Budget)||0).toLocaleString()+' บาท');
+      }
+      return { status:'success', message:'อัปเดตโครงการเรียบร้อย' };
+    }
+    return { status:'error', message:'ไม่พบโครงการ' };
+  } catch(e) { return { status:'error', message:e.toString() }; }
+}
+
+function approveProject(projectId, directorId) {
+  try {
+    var sh = getProjectsSheet(), rows = sh.getDataRange().getValues(), hdrs = rows[0];
+    var tz = Session.getScriptTimeZone();
+    var now = Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm');
+    for (var i=1;i<rows.length;i++) {
+      if (String(rows[i][0]) !== String(projectId)) continue;
+      var dirInfo = getUserInfo(directorId);
+      var idxStatus = hdrs.indexOf('Status');
+      var idxApprovedBy = hdrs.indexOf('ApprovedBy');
+      var idxApprovedDate = hdrs.indexOf('ApprovedDate');
+      var idxUpdated = hdrs.indexOf('UpdatedAt');
+      sh.getRange(i+1, idxStatus+1).setValue(PROJECT_STATUS.APPROVED);
+      sh.getRange(i+1, idxApprovedBy+1).setValue(dirInfo.name);
+      sh.getRange(i+1, idxApprovedDate+1).setValue(now);
+      sh.getRange(i+1, idxUpdated+1).setValue(now);
+      SpreadsheetApp.flush();
+      return { status:'success', message:'อนุมัติโครงการเรียบร้อย' };
+    }
+    return { status:'error', message:'ไม่พบโครงการ' };
+  } catch(e) { return { status:'error', message:e.toString() }; }
+}
+
+function deleteProject(id) {
+  try {
+    var sh = getProjectsSheet(), rows = sh.getDataRange().getValues();
+    for (var i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]) === String(id)) {
+        sh.deleteRow(i+1); SpreadsheetApp.flush();
+        return { status:'success', message:'ลบโครงการเรียบร้อย' };
+      }
+    }
+    return { status:'error', message:'ไม่พบโครงการ' };
+  } catch(e) { return { status:'error', message:e.toString() }; }
+}
+
+function getProjectStats() {
+  try {
+    var sh = getProjectsSheet(), rows = sh.getDataRange().getValues();
+    if (rows.length <= 1) return { status:'success', stats:{total:0,approved:0,inProgress:0,completed:0,pending:0,totalBudget:0,usedBudget:0}, byDept:{} };
+    var hdrs = rows[0], idx = {};
+    hdrs.forEach(function(h,i){ idx[h]=i; });
+    var stats = {total:0,approved:0,inProgress:0,completed:0,pending:0,cancelled:0,totalBudget:0,usedBudget:0};
+    var byDept = {}, recent = [];
+    for (var i=1;i<rows.length;i++) {
+      var r=rows[i]; if(!r[0]) continue;
+      stats.total++;
+      var status=r[idx.Status]||'', budget=Number(r[idx.Budget])||0, used=Number(r[idx.UsedBudget])||0, dept=r[idx.Department]||'';
+      if (status===PROJECT_STATUS.APPROVED)    stats.approved++;
+      if (status===PROJECT_STATUS.IN_PROGRESS) stats.inProgress++;
+      if (status===PROJECT_STATUS.COMPLETED)   stats.completed++;
+      if (status===PROJECT_STATUS.PENDING)     stats.pending++;
+      if (status===PROJECT_STATUS.CANCELLED)   stats.cancelled++;
+      stats.totalBudget+=budget; stats.usedBudget+=used;
+      if (!byDept[dept]) byDept[dept]={budget:0,used:0,count:0,completed:0,inProgress:0};
+      byDept[dept].budget+=budget; byDept[dept].used+=used; byDept[dept].count++;
+      if (status===PROJECT_STATUS.COMPLETED)   byDept[dept].completed++;
+      if (status===PROJECT_STATUS.IN_PROGRESS) byDept[dept].inProgress++;
+      if (recent.length<5) recent.push({id:r[idx.ProjectID],name:r[idx.Name],owner:r[idx.Owner],status:status,budget:budget,dept:dept});
+    }
+    stats.remainingBudget=stats.totalBudget-stats.usedBudget;
+    return { status:'success', stats:stats, byDept:byDept, recent:recent };
+  } catch(e) { return { status:'error', message:e.toString() }; }
+} // end getProjectStats
