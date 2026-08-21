@@ -12,5 +12,5 @@ const APP_CONFIG = {
   APP_NAME: 'ระบบสารบรรณอิเล็กทรอนิกส์',
   SCHOOL_NAME: 'โรงเรียนอนุบาลชุมแสง (วัดทับกฤชกลาง)',
   SESSION_KEY: 'esaraban_session',
-  SESSION_TIMEOUT_HOURS: 8
+  SESSION_TIMEOUT_HOURS: 24
 };
